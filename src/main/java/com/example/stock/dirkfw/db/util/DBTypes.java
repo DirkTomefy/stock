@@ -1,9 +1,9 @@
-package com.example.stock.dirkfw.dao;
+package com.example.stock.dirkfw.db.util;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import com.example.stock.dirkfw.err.NonSqlTypeErr;
+import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
 public class DBTypes {
     public static final HashMap<Class<?>, Integer> SQL_TYPES = getTypeSql();

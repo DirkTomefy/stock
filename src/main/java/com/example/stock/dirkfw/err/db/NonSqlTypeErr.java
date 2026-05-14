@@ -1,4 +1,4 @@
-package com.example.stock.dirkfw.err;
+package com.example.stock.dirkfw.err.db;
 
 public class NonSqlTypeErr extends Exception {
     Class<?> clazz;

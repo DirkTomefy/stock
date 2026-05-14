@@ -1,10 +1,10 @@
-package com.example.stock.dirkfw.dao.util;
+package com.example.stock.dirkfw.db.util;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.example.stock.dirkfw.dao.start.mapping.FieldInfo;
-import com.example.stock.dirkfw.err.NonSqlTypeErr;
+import com.example.stock.dirkfw.db.start.mapping.FieldInfo;
+import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
 @FunctionalInterface
 public interface FieldProcessor {

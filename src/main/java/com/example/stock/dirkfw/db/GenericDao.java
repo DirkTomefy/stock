@@ -1,15 +1,16 @@
-package com.example.stock.dirkfw.dao;
+package com.example.stock.dirkfw.db;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Vector;
-import com.example.stock.dirkfw.dao.start.mapping.*;
-import com.example.stock.dirkfw.dao.start.query.*;
+
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwObject;
-import com.example.stock.dirkfw.dao.reflect.ReflectManager;
-import com.example.stock.dirkfw.dao.util.*;
+import com.example.stock.dirkfw.db.query.*;
+import com.example.stock.dirkfw.db.start.mapping.*;
+import com.example.stock.dirkfw.db.start.reflect.ReflectManager;
+import com.example.stock.dirkfw.db.util.*;
 
 public class GenericDao {
     public DatabaseContext dbctx;

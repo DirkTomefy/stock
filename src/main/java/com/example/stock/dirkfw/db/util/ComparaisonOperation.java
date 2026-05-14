@@ -1,4 +1,4 @@
-package com.example.stock.dirkfw.dao.util;
+package com.example.stock.dirkfw.db.util;
 
 public enum ComparaisonOperation {
     INF,

@@ -1,8 +1,8 @@
-package com.example.stock.dirkfw.dao.start.query;
+package com.example.stock.dirkfw.db.query;
 
 
-import com.example.stock.dirkfw.dao.start.mapping.*;
-import com.example.stock.dirkfw.err.NoFieldIDErr;
+import com.example.stock.dirkfw.db.start.mapping.*;
+import com.example.stock.dirkfw.err.db.NoFieldIDErr;
 
 
 public class QueryMaker {

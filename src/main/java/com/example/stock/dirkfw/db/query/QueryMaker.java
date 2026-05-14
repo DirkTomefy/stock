@@ -1,8 +1,8 @@
 package com.example.stock.dirkfw.db.query;
 
 
-import com.example.stock.dirkfw.db.start.mapping.*;
 import com.example.stock.dirkfw.err.db.NoFieldIDErr;
+import com.example.stock.dirkfw.start.mapping.*;
 
 
 public class QueryMaker {
@@ -11,7 +11,7 @@ public class QueryMaker {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) builder.append(separator);
-            builder.append(fields[i].getReflectField().getName());
+            builder.append(fields[i].getDFWName());
         }
         return builder.toString();
     }
@@ -38,9 +38,9 @@ public class QueryMaker {
         StringBuilder setClause = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) setClause.append(", ");
-            setClause.append(fields[i].getReflectField().getName()).append(" = ?");
+            setClause.append(fields[i].getDFWName()).append(" = ?");
         }
-        String idField = tableMap.getFieldID().getReflectField().getName();
+        String idField = tableMap.getFieldID().getDFWName();
         return "UPDATE " + tableMap.getTableName() + " SET " + setClause + " WHERE " + idField + " = ?";
     }
 
@@ -49,12 +49,12 @@ public class QueryMaker {
     }
 
     public static String getQueryForDelete(TableMap tableMap) {
-        String idField = tableMap.getFieldID().getReflectField().getName();
+        String idField = tableMap.getFieldID().getDFWName();
         return "DELETE FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForFindByID(TableMap tableMap) {
-        String idField = tableMap.getFieldID().getReflectField().getName();
+        String idField = tableMap.getFieldID().getDFWName();
         return "SELECT * FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
@@ -73,7 +73,7 @@ public class QueryMaker {
                 } else {
                     whereClause.append(" AND ");
                 }
-                whereClause.append(fi.getReflectField().getName()).append(" = ?");
+                whereClause.append(fi.getDFWName()).append(" = ?");
             }
         }
 
@@ -84,7 +84,7 @@ public class QueryMaker {
             } else {
                 whereClause.append(" AND ");
             }
-            whereClause.append(tableMap.getFieldID().getReflectField().getName()).append(" = ?");
+            whereClause.append(tableMap.getFieldID().getDFWName()).append(" = ?");
         }
 
         query.append(whereClause);

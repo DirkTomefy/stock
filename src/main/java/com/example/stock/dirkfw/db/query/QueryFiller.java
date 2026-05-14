@@ -2,9 +2,9 @@ package com.example.stock.dirkfw.db.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.example.stock.dirkfw.db.start.mapping.*;
 import com.example.stock.dirkfw.db.util.FieldProcessor;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
+import com.example.stock.dirkfw.start.mapping.*;
 public class QueryFiller {
 
     private static int processFields(PreparedStatement pstmt, TableMap tableMap, Object o, int index, FieldProcessor processor)

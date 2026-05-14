@@ -8,9 +8,9 @@ import java.util.Vector;
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.db.query.*;
-import com.example.stock.dirkfw.db.start.mapping.*;
-import com.example.stock.dirkfw.db.start.reflect.ReflectManager;
 import com.example.stock.dirkfw.db.util.*;
+import com.example.stock.dirkfw.start.mapping.*;
+import com.example.stock.dirkfw.start.reflect.ReflectManager;
 
 public class GenericDao {
     public DatabaseContext dbctx;

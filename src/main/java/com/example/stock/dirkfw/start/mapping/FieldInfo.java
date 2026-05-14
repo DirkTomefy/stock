@@ -6,7 +6,6 @@ import java.lang.reflect.Method;
 
 public class FieldInfo {
     Field reflectField;
-    
 
     Method getter;
     Method setter;
@@ -21,6 +20,10 @@ public class FieldInfo {
     }
     public void setReflectField(Field reflectField) {
         this.reflectField = reflectField;
+    }
+
+    public String getDFWName(){
+        return this.reflectField.getName();
     }
 
     public void setGetter(Method getter) {

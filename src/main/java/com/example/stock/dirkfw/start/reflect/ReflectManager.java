@@ -12,6 +12,7 @@ import java.util.Set;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
 import com.example.stock.dirkfw.db.util.DBTypes;
@@ -69,7 +70,7 @@ public class ReflectManager {
     public static HashMap<String, TableMap> getAllClassFromPackage(String packageName) throws Exception {
         HashMap<String, TableMap> result = new HashMap<>();
         Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
-        Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
+        Set<Class<? extends DirkFwObject>> classes = reflections.getSubTypesOf(DirkFwObject.class);
         System.out.println("" + classes.size());
         for (Class<?> clazz : classes) {
             result.put(clazz.getName(), buildTableMap(clazz));

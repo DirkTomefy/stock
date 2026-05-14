@@ -2,9 +2,10 @@ package com.example.stock.model;
 
 import java.time.LocalDateTime;
 
+import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.annotation.db.IdField;
 
-public class ArticleModel {
+public class ArticleModel extends DirkFwObject{
     @IdField
     private Integer id;
 
@@ -24,9 +25,11 @@ public class ArticleModel {
     private String sigleGestionStock;
 
     public ArticleModel() {
+        super(null);
     }
 
     public ArticleModel(Integer id, String libelle, String sigleGestionStock) {
+        super(null);
         this.id = id;
         this.libelle = libelle;
         this.sigleGestionStock = sigleGestionStock;

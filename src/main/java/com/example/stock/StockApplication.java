@@ -2,7 +2,6 @@ package com.example.stock;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.time.LocalDateTime;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -10,7 +9,7 @@ import javax.swing.JOptionPane;
 import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.display.classes.GenericFormPanel;
 import com.example.stock.dirkfw.start.reflect.ReflectManager;
-import com.example.stock.model.MouvementModel;
+import com.example.stock.model.ArticleModel;
 
 public class StockApplication {
 
@@ -20,9 +19,8 @@ public class StockApplication {
 	public static void main(String[] args) throws Exception {
 		init();
 		
-		// Test GenericFormPanel avec MouvementModel (qui contient un champ LocalDateTime)
-		MouvementModel mouvement = new MouvementModel();
-		mouvement.setDateMouvement(LocalDateTime.now());
+		// Test GenericFormPanel
+		ArticleModel article = new ArticleModel();
 		
 		MouseListener validateListener = new MouseListener() {
 			@Override
@@ -39,13 +37,13 @@ public class StockApplication {
 			public void mouseExited(MouseEvent e) {}
 		};
 		
-		GenericFormPanel formPanel = new GenericFormPanel(mouvement, validateListener);
+		GenericFormPanel formPanel = new GenericFormPanel(article, validateListener);
 		
-		JFrame frame = new JFrame("Gestion des Mouvements - Formulaire");
+		JFrame frame = new JFrame("Gestion des Articles - Formulaire");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(true);
 		frame.add(formPanel);
-		frame.setSize(500, 600);
+		frame.setSize(500, 400);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}

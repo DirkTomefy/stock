@@ -1,84 +1,101 @@
 package com.example.stock.dirkfw.display.classes;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
-import javax.swing.JFormattedTextField;
-import javax.swing.text.NumberFormatter;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
+import javax.swing.BoxLayout;
 
+import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
+import java.util.Date;
+import java.util.Calendar;
 
-public class DFWDateField extends JFormattedTextField {
+public class DFWDateField extends JPanel implements DFWInput {
     
-    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private FieldInfo fieldInfo;
+
+    private DirkFwObject object;
     
-    public DFWDateField(FieldInfo fieldInfo, Object object) {
-        super();
-        this.fieldInfo = fieldInfo;
-        
-        // Configuration du format
-        NumberFormatter formatter = new NumberFormatter();
-        setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(formatter));
-        
-        // Définir la valeur initiale
-        String value = getFieldValueAsString(fieldInfo, object);
-        setText(value);
-        
-        setColumns(20);
+    public DirkFwObject getObject() {
+        return object;
     }
+
+    public void setObject(DirkFwObject object) {
+        this.object = object;
+    }
+
+    private JSpinner dateSpinner;
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     
-    public static String getFieldValueAsString(FieldInfo fieldInfo, Object object) {
+    public static DateTimeFormatter getFormatter() {
+        return formatter;
+    }
+
+    public DFWDateField(FieldInfo fieldInfo, DirkFwObject object) {
+        super();
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        
+        this.fieldInfo = fieldInfo;
+        this.object = object;
+        
+        // Créer le spinner pour la date
+        SpinnerDateModel model = new SpinnerDateModel();
+        dateSpinner = new JSpinner(model);
+        JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm");
+        dateSpinner.setEditor(editor);
+        
+        // Initialiser avec la valeur actuelle si elle existe
         try {
             Object value = fieldInfo.getFieldValue(object);
-            if (value == null) {
-                return "";
-            }
-            
             if (value instanceof LocalDateTime) {
-                return ((LocalDateTime) value).format(DATETIME_FORMATTER);
-            } else if (value instanceof LocalDate) {
-                return ((LocalDate) value).format(DATE_FORMATTER);
-            } else if (value instanceof Date) {
-                LocalDateTime ldt = ((Date) value).toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDateTime();
-                return ldt.format(DATETIME_FORMATTER);
+                LocalDateTime ldt = (LocalDateTime) value;
+                Calendar cal = Calendar.getInstance();
+                cal.set(ldt.getYear(), ldt.getMonthValue() - 1, ldt.getDayOfMonth(),
+                        ldt.getHour(), ldt.getMinute(), ldt.getSecond());
+                model.setValue(cal.getTime());
             }
-            
-            return value.toString();
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            return "";
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        
+        add(dateSpinner);
     }
     
-    public Object getFieldValue() {
-        String text = getText().trim();
-        if (text.isEmpty()) {
+    public Object getValue() {
+        Date date = (Date) dateSpinner.getValue();
+        if (date == null) {
             return null;
         }
         
-        try {
-            Class<?> fieldType = fieldInfo.getReflectField().getType();
-            
-            if (fieldType == LocalDateTime.class) {
-                return LocalDateTime.parse(text, DATETIME_FORMATTER);
-            } else if (fieldType == LocalDate.class) {
-                return LocalDate.parse(text, DATE_FORMATTER);
-            } else if (fieldType == Date.class) {
-                LocalDateTime ldt = LocalDateTime.parse(text, DATETIME_FORMATTER);
-                return java.sql.Timestamp.valueOf(ldt);
-            }
-        } catch (Exception e) {
-            System.err.println("Erreur lors du parsing de la date: " + e.getMessage());
-        }
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
         
-        return null;
+        return LocalDateTime.of(
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH) + 1,
+            cal.get(Calendar.DAY_OF_MONTH),
+            cal.get(Calendar.HOUR_OF_DAY),
+            cal.get(Calendar.MINUTE),
+            cal.get(Calendar.SECOND)
+        );
+    }
+    
+    public void setValue(Object value) {
+        if (value instanceof LocalDateTime) {
+            LocalDateTime ldt = (LocalDateTime) value;
+            Calendar cal = Calendar.getInstance();
+            cal.set(ldt.getYear(), ldt.getMonthValue() - 1, ldt.getDayOfMonth(),
+                    ldt.getHour(), ldt.getMinute(), ldt.getSecond());
+            dateSpinner.setValue(cal.getTime());
+        }
+    }
+
+    @Override
+    public FieldInfo getFieldInfo() {
+        return this.fieldInfo;
     }
 }
-

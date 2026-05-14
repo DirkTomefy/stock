@@ -1,4 +1,4 @@
-package com.example.stock.dirkfw.db.start.reflect;
+package com.example.stock.dirkfw.start.reflect;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -14,12 +14,12 @@ import org.reflections.scanners.SubTypesScanner;
 
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
-import com.example.stock.dirkfw.db.start.mapping.FieldInfo;
-import com.example.stock.dirkfw.db.start.mapping.TableMap;
 import com.example.stock.dirkfw.db.util.DBTypes;
 import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
+import com.example.stock.dirkfw.start.mapping.FieldInfo;
+import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class ReflectManager {
 

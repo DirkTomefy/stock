@@ -1,4 +1,4 @@
-package com.example.stock.dirkfw.db.start.mapping;
+package com.example.stock.dirkfw.start.mapping;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

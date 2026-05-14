@@ -6,7 +6,7 @@ import java.util.Vector;
 import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.db.GenericDao;
-import com.example.stock.dirkfw.db.start.mapping.TableMap;
+import com.example.stock.dirkfw.start.mapping.TableMap;
 
 
 

@@ -1,7 +1,7 @@
 package com.example.stock;
 
 import com.example.stock.dirkfw.DirkFwObject;
-import com.example.stock.dirkfw.db.start.reflect.ReflectManager;
+import com.example.stock.dirkfw.start.reflect.ReflectManager;
 
 public class StockApplication {
 

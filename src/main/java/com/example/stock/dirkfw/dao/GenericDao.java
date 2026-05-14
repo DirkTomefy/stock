@@ -3,7 +3,6 @@ package com.example.stock.dirkfw.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashMap;
 import java.util.Vector;
 import com.example.stock.dirkfw.dao.start.mapping.*;
 import com.example.stock.dirkfw.dao.start.query.*;
@@ -22,17 +21,12 @@ public class GenericDao  {
         }
     }
 
-
-    public static HashMap<String, TableMap> getClassinfos() {
-        return DirkFwObject.classinfos;
-    }
-
     public static TableMap getTableMapInfo(Class<?> clazz) {
-        return DirkFwObject.classinfos.get(clazz.getName());
+        return DirkFwObject.classInfos.get(clazz.getName());
     }
 
     public static TableMap getTableMapInfo(String clazz) {
-        return DirkFwObject.classinfos.get(clazz);
+        return DirkFwObject.classInfos.get(clazz);
     }
 
     

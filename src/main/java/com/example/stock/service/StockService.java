@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 // import com.example.stock.dao.MouvementDAO;0
 import com.example.stock.model.MouvementModel;
-import com.example.stock.model.result.MouvementDetailResult;
+import com.example.stock.service.result.MouvementDetailResult;
 
 public class StockService {
     public static MouvementDetailResult getMouvementDetailsByDate(LocalDateTime date1,Integer idArticle) throws Exception{

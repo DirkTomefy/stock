@@ -1,13 +1,15 @@
 package com.example.stock;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.dao.reflect.ReflectManager;
 
-@SpringBootApplication
 public class StockApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(StockApplication.class, args);
+	public static void init() throws Exception{
+		DirkFwObject.setClassInfos(ReflectManager.getAllClassFromPackage("package com.example.stock.model"));
+	}
+	public static void main(String[] args) throws Exception {
+		init();
 	}
 
 }

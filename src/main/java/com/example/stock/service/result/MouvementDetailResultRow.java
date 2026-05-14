@@ -1,4 +1,4 @@
-package com.example.stock.model.result;
+package com.example.stock.service.result;
 
 import com.example.stock.model.MouvementModel;
 

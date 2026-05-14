@@ -7,20 +7,34 @@ import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.dao.GenericDao;
 import com.example.stock.dirkfw.dao.start.mapping.TableMap;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+
+
 public class DirkFwObject {
     @IgnoreDisplayOpperation
     @IgnoreDbOpperation
-    public static HashMap<String, TableMap> classinfos;
+    public static HashMap<String, TableMap> classInfos;
+    
+    public static HashMap<String, TableMap> getClassInfos() {
+        return classInfos;
+    }
+
+    public static void setClassInfos(HashMap<String, TableMap> classInfos) {
+        DirkFwObject.classInfos = classInfos;
+    }
 
     @IgnoreDisplayOpperation
     @IgnoreDbOpperation
     GenericDao dao;
 
+
+    public GenericDao getDao() {
+        return dao;
+    }
+
+    public void setDao(GenericDao dao) {
+        this.dao = dao;
+    }
 
     public DirkFwObject(GenericDao dao) {
         this.dao = dao;

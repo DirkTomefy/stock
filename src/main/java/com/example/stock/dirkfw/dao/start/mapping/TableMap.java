@@ -29,6 +29,8 @@ public class TableMap {
         return allFieldWithoutID;
     }
 
+    
+
     public void setAllFieldWithoutID(FieldInfo[] allFieldWithoutID) {
         this.allFieldWithoutID = allFieldWithoutID;
     }

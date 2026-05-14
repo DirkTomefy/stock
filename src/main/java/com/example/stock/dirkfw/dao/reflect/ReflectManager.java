@@ -48,11 +48,9 @@ public class ReflectManager {
 
     public static Method getterField(Class<?> clazz, Field f) throws NoGetterAvailable {
         String fieldName = f.getName();
-
-        String getterName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        String methodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
         try {
-            Method getter = clazz.getMethod(getterName);
-            return getter;
+            return clazz.getMethod(methodName);
         } catch (NoSuchMethodException ex) {
             throw new NoGetterAvailable(fieldName, clazz.getName(), ex);
         }
@@ -60,63 +58,42 @@ public class ReflectManager {
 
     public static Method setterField(Class<?> clazz, Field f) throws NoSetterAvailable {
         String fieldName = f.getName();
-
-        String setterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+        String methodName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
         try {
-            java.lang.reflect.Method setter = clazz.getMethod(setterName, f.getType());
-            return setter;
+            return clazz.getMethod(methodName, f.getType());
         } catch (NoSuchMethodException ex) {
             throw new NoSetterAvailable(fieldName, clazz.getName(), ex);
         }
     }
 
     public static HashMap<String, TableMap> getAllClassFromPackage(String packageName) throws Exception {
-
         HashMap<String, TableMap> result = new HashMap<>();
-
-        try {
-            Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
-            Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
-            System.out.println("" + classes.size());
-            for (Class<?> clazz : classes) {
-                result.put(clazz.getName(), buildTableMap(clazz));
-            }
-
-        } catch (Exception e) {
-            throw e;
+        Reflections reflections = new Reflections(packageName, new SubTypesScanner(false));
+        Set<Class<?>> classes = reflections.getSubTypesOf(Object.class);
+        System.out.println("" + classes.size());
+        for (Class<?> clazz : classes) {
+            result.put(clazz.getName(), buildTableMap(clazz));
         }
-
         return result;
     }
 
     private static TableMap buildTableMap(Class<?> clazz) throws Exception {
-
         TableMap tableMap = new TableMap();
         tableMap.setTableName(clazz.getSimpleName());
-
-        List<FieldInfo> fieldInfos = new ArrayList<>();
         tableMap.setConstructor(clazz.getConstructor());
 
+        List<FieldInfo> fieldInfos = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
             if (!isFieldOpperable(field)) 
                 continue;
-            try {
-                FieldInfo inf = new FieldInfo(
-                        field, ReflectManager.getterField(clazz, field),
-                        ReflectManager.setterField(clazz, field));
-                if (ReflectManager.isIdField(field)) {
-                    tableMap.setFieldID(inf);
-                } else {
-                    fieldInfos.add(inf);
-                }
-            } catch (NoGetterAvailable | NoSetterAvailable e) {
-                throw e;
+            FieldInfo inf = new FieldInfo(field, getterField(clazz, field), setterField(clazz, field));
+            if (isIdField(field)) {
+                tableMap.setFieldID(inf);
+            } else {
+                fieldInfos.add(inf);
             }
-
         }
-
         tableMap.setAllFieldWithoutID(fieldInfos.toArray(new FieldInfo[0]));
-
         return tableMap;
     }
 

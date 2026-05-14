@@ -9,16 +9,27 @@ import com.example.stock.dirkfw.dao.start.query.*;
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.dao.reflect.ReflectManager;
+import com.example.stock.dirkfw.dao.util.*;
 
-public class GenericDao  {
+public class GenericDao {
     public DatabaseContext dbctx;
 
-    public void save(Object o) throws Exception {
+    private void executeWithConnection(ConnectionOperation operation) throws Exception {
         try (Connection conn = dbctx.getConnection()) {
             conn.setAutoCommit(false);
-            save(o, conn);
+            operation.execute(conn);
             conn.commit();
         }
+    }
+
+    private <T> T executeQueryWithConnection(ConnectionQuery<T> query) throws Exception {
+        try (Connection conn = dbctx.getConnection()) {
+            return query.execute(conn);
+        }
+    }
+
+    public void save(Object o) throws Exception {
+        executeWithConnection(conn -> save(o, conn));
     }
 
     public static TableMap getTableMapInfo(Class<?> clazz) {
@@ -29,36 +40,27 @@ public class GenericDao  {
         return DirkFwObject.classInfos.get(clazz);
     }
 
-    
-
     public void update(Object o)
             throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
-            conn.setAutoCommit(false);
-            update(o, conn);
-            conn.commit();
-        }
+        executeWithConnection(conn -> update(o, conn));
     }
 
     public Vector<Object> getAll(Class<?> clazz)
             throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
-            return getAll(clazz, conn);
-        }
+        return executeQueryWithConnection(conn -> getAll(clazz, conn));
     }
 
     public Vector<Object> getAll(Object where)
             throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
-            return getAll(where, conn);
-        }
+        return executeQueryWithConnection(conn -> getAll(where, conn));
     }
 
     public void findById(Object e)
             throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
+        executeQueryWithConnection(conn -> {
             findById(e, conn);
-        }
+            return null;
+        });
     }
 
     public Vector<Object> getAll(Class<?> clazz, Connection conn)
@@ -112,7 +114,7 @@ public class GenericDao  {
         try (PreparedStatement preparedStatement = conn.prepareStatement(request,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-            QueryFiller.fillpstmt(preparedStatement, tableMap, o);
+            QueryFiller.fillpstmtForUpdates(preparedStatement, tableMap, o);
             preparedStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -156,17 +158,17 @@ public class GenericDao  {
         Object idValue = tableMap.getIdFieldValue(o);
         String request = QueryMaker.getQueryForUpdate(tableMap, o);
         try (PreparedStatement preparedStatement = conn.prepareStatement(request)) {
-            int i = QueryFiller.fillpstmt(preparedStatement, tableMap, o);
+            int i = QueryFiller.fillpstmtForUpdates(preparedStatement, tableMap, o);
             preparedStatement.setObject(i, idValue);
             preparedStatement.executeUpdate();
         }
     }
 
-    
     public void delete(Object o) throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
-           delete(o, conn);
-        }
+        executeQueryWithConnection(conn -> {
+            delete(o, conn);
+            return null;
+        });
     }
 
 }

@@ -1,51 +1,49 @@
 package com.example.stock.dirkfw.dao.start.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-import com.example.stock.dirkfw.dao.DBTypes;
 import com.example.stock.dirkfw.dao.start.mapping.*;
 import com.example.stock.dirkfw.err.NonSqlTypeErr;
-
+import com.example.stock.dirkfw.dao.util.FieldProcessor;
 public class QueryFiller {
-     public static int fillpstmtFromIndex(PreparedStatement pstmt, TableMap tableMap, Object o, int index)
+
+    private static int processFields(PreparedStatement pstmt, TableMap tableMap, Object o, int index, FieldProcessor processor)
             throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
         for (FieldInfo fInfo : tableMap.getAllFieldWithoutID()) {
-            try {
-                Object value = fInfo.getFieldValue(o);
-                if (value == null) {
-                    pstmt.setNull(index++, DBTypes.getSqlType(fInfo.getReflectField().getType()));
-                } else {
-                    pstmt.setObject(index++, value);
-                }
-            } catch (SQLException e) {
-                throw e;
-            }
-
+            index = processor.process(pstmt, index, fInfo, o);
         }
-
+        FieldInfo idField = tableMap.getFieldID();
+        index = processor.process(pstmt, index, idField, o);
         return index;
     }
 
-    public static int fillpstmt(PreparedStatement pstmt, TableMap tableMap, Object o)
+    public static int fillpstmtFromIndex(PreparedStatement pstmt, TableMap tableMap, Object o, int index)
             throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
-        int index = 1;
-        return fillpstmtFromIndex(pstmt, tableMap, o, index);
+        
+        return processFields(pstmt, tableMap, o, index, (stmt, idx, fi, obj) -> {
+            Object value = fi.getFieldValue(obj);
+            if (value == null) {
+                stmt.setNull(idx, java.sql.Types.VARCHAR);
+            } else {
+                stmt.setObject(idx, value);
+            }
+            return idx + 1;
+        });
+    }
+
+    public static int fillpstmtForUpdates(PreparedStatement pstmt, TableMap tableMap, Object o)
+            throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
+        return fillpstmtFromIndex(pstmt, tableMap, o, 1);
     }
 
     public static int fillWhere(PreparedStatement pstmt, TableMap tableMap, Object where)
-        throws ReflectiveOperationException, SQLException {
-
-    int index = 1;
-
-    for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
-        Object value = fi.getFieldValue(where);
-        if (value==null) {
-            pstmt.setObject(index++, value);
-        }
+        throws ReflectiveOperationException, SQLException, NonSqlTypeErr {
+        return processFields(pstmt, tableMap, where, 1, (stmt, idx, fi, obj) -> {
+            Object value = fi.getFieldValue(obj);
+            if (value != null) {
+                stmt.setObject(idx, value);
+                return idx + 1;
+            }
+            return idx;
+        });
     }
-
-    return index;
-}
-
-    
 }

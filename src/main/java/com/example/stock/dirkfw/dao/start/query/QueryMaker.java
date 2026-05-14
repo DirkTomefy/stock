@@ -1,54 +1,47 @@
 package com.example.stock.dirkfw.dao.start.query;
 
-import java.lang.reflect.Field;
 
 import com.example.stock.dirkfw.dao.start.mapping.*;
 import com.example.stock.dirkfw.err.NoFieldIDErr;
 
 
 public class QueryMaker {
-    public static String getQueryForInsert(TableMap tableMap, Object o) {
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("INSERT INTO ").append(tableMap.getTableName()).append(" (");
-        StringBuilder columnsBuilder = new StringBuilder();
-        StringBuilder valuesBuilder = new StringBuilder();
-
-        boolean first = true;
-        for (FieldInfo fieldInfo : tableMap.getAllFieldWithoutID()) {
-            if (!first) {
-                columnsBuilder.append(", ");
-                valuesBuilder.append(", ");
-            } else {
-                first = false;
-            }
-            columnsBuilder.append(fieldInfo.getReflectField().getName());
-            valuesBuilder.append("?");
+    
+    private static String buildColumnList(FieldInfo[] fields, String separator) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < fields.length; i++) {
+            if (i > 0) builder.append(separator);
+            builder.append(fields[i].getReflectField().getName());
         }
-        sqlBuilder.append(columnsBuilder)
-                .append(") VALUES (")
-                .append(valuesBuilder)
-                .append(")");
-        return sqlBuilder.toString();
+        return builder.toString();
+    }
+
+    private static String buildPlaceholderList(FieldInfo[] fields) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < fields.length; i++) {
+            if (i > 0) builder.append(", ");
+            builder.append("?");
+        }
+        return builder.toString();
+    }
+
+    public static String getQueryForInsert(TableMap tableMap, Object o) {
+        FieldInfo[] fields = tableMap.getAllFieldWithoutID();
+        String columns = buildColumnList(fields, ", ");
+        String placeholders = buildPlaceholderList(fields);
+        return "INSERT INTO " + tableMap.getTableName() + " (" + columns + ") VALUES (" + placeholders + ")";
     }
 
     public static String getQueryForUpdate(TableMap tableMap, Object o)
             throws NoFieldIDErr {
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append(" UPDATE ").append(tableMap.getTableName()).append(" SET ");
-
-        boolean first = true;
-        for (FieldInfo field : tableMap.getAllFieldWithoutID()) {
-            if (!first) {
-                sqlBuilder.append(", ");
-            } else {
-                first = false;
-            }
-            sqlBuilder.append(field.getReflectField().getName());
-            sqlBuilder.append(" = ?");
+        FieldInfo[] fields = tableMap.getAllFieldWithoutID();
+        StringBuilder setClause = new StringBuilder();
+        for (int i = 0; i < fields.length; i++) {
+            if (i > 0) setClause.append(", ");
+            setClause.append(fields[i].getReflectField().getName()).append(" = ?");
         }
-
-        sqlBuilder.append(" WHERE ").append(tableMap.getFieldID().getReflectField().getName()).append(" = ?");
-        return sqlBuilder.toString();
+        String idField = tableMap.getFieldID().getReflectField().getName();
+        return "UPDATE " + tableMap.getTableName() + " SET " + setClause + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForGetAll(TableMap tableMap) {
@@ -56,43 +49,45 @@ public class QueryMaker {
     }
 
     public static String getQueryForDelete(TableMap tableMap) {
-        return "DELETE FROM " + tableMap.getTableName() + " WHERE " + tableMap.getFieldID().getReflectField().getName()
-                + " = ?";
+        String idField = tableMap.getFieldID().getReflectField().getName();
+        return "DELETE FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForFindByID(TableMap tableMap) {
-        return "SELECT * FROM " + tableMap.getTableName() + " WHERE " + tableMap.getFieldID().getReflectField().getName()
-                + " = ?";
+        String idField = tableMap.getFieldID().getReflectField().getName();
+        return "SELECT * FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
-    // TODO Warnings : Tsy maka ny id izy
+    
     public static String getQueryForSelectWhere(TableMap tableMap, Object where)
             throws ReflectiveOperationException {
 
-        StringBuilder query = new StringBuilder();
-        query.append("SELECT * FROM ").append(tableMap.getTableName());
-
+        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableMap.getTableName());
         StringBuilder whereClause = new StringBuilder();
 
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
-
-            Field field = fi.getReflectField();
             Object value = fi.getFieldValue(where);
-
-            if (value == null) {
-
+            if (value != null) {
                 if (whereClause.length() == 0) {
                     whereClause.append(" WHERE ");
                 } else {
                     whereClause.append(" AND ");
                 }
-
-                whereClause.append(field.getName()).append(" = ?");
+                whereClause.append(fi.getReflectField().getName()).append(" = ?");
             }
         }
 
-        query.append(whereClause);
+         Object idValue = tableMap.getIdFieldValue(where);
+         if (idValue != null) {
+            if (whereClause.length() == 0) {
+                whereClause.append(" WHERE ");
+            } else {
+                whereClause.append(" AND ");
+            }
+            whereClause.append(tableMap.getFieldID().getReflectField().getName()).append(" = ?");
+        }
 
+        query.append(whereClause);
         return query.toString();
     }
 

@@ -4,18 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseConnection {
+public class DatabaseContext {
 
-    private static final String URL =
+    private final String URL =
             "jdbc:postgresql://localhost:5432/stock";
 
-    private static final String USER =
+    private  final String USER =
             "postgres";
 
-    private static final String PASSWORD =
+    private final String PASSWORD =
             "postgres";
 
-    public static Connection getConnection() throws Exception {
+    public  Connection getConnection() throws SQLException , ClassNotFoundException {
 
         try {
 
@@ -29,10 +29,8 @@ public class DatabaseConnection {
 
         } catch (ClassNotFoundException | SQLException e) {
 
-            throw new Exception(
-                    "Erreur de connexion à PostgreSQL",
-                    e
-            );
+            throw e;
+          
         }
     }
 }

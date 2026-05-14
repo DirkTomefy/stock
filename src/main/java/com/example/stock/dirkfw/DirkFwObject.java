@@ -1,0 +1,48 @@
+package com.example.stock.dirkfw;
+
+import java.util.HashMap;
+import java.util.Vector;
+
+import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
+import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
+import com.example.stock.dirkfw.dao.GenericDao;
+import com.example.stock.dirkfw.dao.start.mapping.TableMap;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class DirkFwObject {
+    @IgnoreDisplayOpperation
+    @IgnoreDbOpperation
+    public static HashMap<String, TableMap> classinfos;
+
+    @IgnoreDisplayOpperation
+    @IgnoreDbOpperation
+    GenericDao dao;
+
+
+    public DirkFwObject(GenericDao dao) {
+        this.dao = dao;
+    }
+
+    public void save() throws Exception {
+        this.dao.save(this);
+    }
+
+    public void update() throws Exception {
+        this.dao.update(this);
+    }
+
+    public void delete() throws Exception {
+            this.dao.delete(this);
+    }
+
+    public void findById() throws Exception {
+        this.dao.findById(this);
+    }
+
+    public Vector<Object> getAll() throws Exception {
+        return this.dao.getAll(this);
+    }
+}

@@ -1,11 +1,19 @@
 package com.example.stock.dirkfw.display.classes;
 
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -16,23 +24,32 @@ import com.example.stock.dirkfw.start.reflect.ReflectManager;
 public class GenericFormPanel extends JPanel {
 
     private final Object object;
-    private HashMap<String,DFWTextField> inputs;
+    private HashMap<String, JComponent> inputs;
     private MouseListener validateFormListener;
     public GenericFormPanel(Object object,MouseListener validateFormListener) {
-        super(new GridLayout(0, 2));
+        setLayout(new BorderLayout(10, 10));
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setBackground(new Color(245, 245, 245));
 
         this.object = object;
         this.inputs = new HashMap<>();
         this.validateFormListener = validateFormListener;
 
+        // Panel pour les champs
+        JPanel fieldsPanel = new JPanel();
+        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
+        fieldsPanel.setBackground(new Color(245, 245, 245));
+
         FieldInfo[] fields =  DirkFwObject.getClassInfos().get(object.getClass().getName()).getAllFieldWithoutID();
 
         for (FieldInfo fieldInfo : fields) {
-            if(isDisplayable(fieldInfo.getReflectField()))
-            addField(fieldInfo);
+            if(isDisplayable(fieldInfo.getReflectField())) {
+                addField(fieldInfo, fieldsPanel);
+            }
         }
         
-        addValidateButton();
+        add(fieldsPanel, BorderLayout.CENTER);
+        add(createButtonPanel(), BorderLayout.SOUTH);
     }
 
    
@@ -42,21 +59,64 @@ public class GenericFormPanel extends JPanel {
                 && !ReflectManager.isIdField(field);
     }
 
-    private void addField(FieldInfo fieldInfo) {
-        JLabel label = new JLabel(fieldInfo.getDFWName());
+    private void addField(FieldInfo fieldInfo, JPanel panel) {
+        JPanel fieldPanel = new JPanel();
+        fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.X_AXIS));
+        fieldPanel.setBackground(new Color(245, 245, 245));
+        fieldPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 40));
 
-        DFWTextField input = new DFWTextField(fieldInfo, object);
+        JLabel label = new JLabel(fieldInfo.getDFWName());
+        label.setFont(new Font("Arial", Font.PLAIN, 12));
+        label.setPreferredSize(new java.awt.Dimension(120, 30));
+
+        // Déterminer le type de champ et créer le composant approprié
+        JComponent input;
+        Class<?> fieldType = fieldInfo.getReflectField().getType();
+        
+        if (isDateField(fieldType)) {
+            input = new DFWDateField(fieldInfo, object);
+        } else {
+            input = new DFWTextField(fieldInfo, object);
+        }
+        
+        input.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
+
         this.inputs.put(fieldInfo.getDFWName(), input);
-        add(label);
-        add(input);
+        fieldPanel.add(label);
+        fieldPanel.add(Box.createHorizontalStrut(10));
+        fieldPanel.add(input);
+        
+        panel.add(fieldPanel);
+        panel.add(Box.createVerticalStrut(10));
     }
 
-    private void addValidateButton() {
+    private boolean isDateField(Class<?> fieldType) {
+        return fieldType == LocalDateTime.class || 
+               fieldType == LocalDate.class || 
+               fieldType == Date.class ||
+               fieldType == java.sql.Date.class ||
+               fieldType == java.sql.Timestamp.class;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+        buttonPanel.setBackground(new Color(245, 245, 245));
+
+        buttonPanel.add(Box.createHorizontalGlue());
         JButton validateButton = new JButton("Valider");
+        validateButton.setFont(new Font("Arial", Font.BOLD, 12));
+        validateButton.setBackground(new Color(70, 130, 180));
+        validateButton.setForeground(Color.WHITE);
+        validateButton.setFocusPainted(false);
+        validateButton.setPreferredSize(new java.awt.Dimension(120, 40));
+        
         if (validateFormListener != null) {
             validateButton.addMouseListener(validateFormListener);
         }
-        add(validateButton);
+        buttonPanel.add(validateButton);
+        buttonPanel.add(Box.createHorizontalStrut(5));
+        return buttonPanel;
     }
     
 }

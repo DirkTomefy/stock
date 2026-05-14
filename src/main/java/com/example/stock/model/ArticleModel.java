@@ -1,10 +1,24 @@
 package com.example.stock.model;
 
-public class ArticleModel {
+import java.time.LocalDateTime;
 
+import com.example.stock.dirkfw.annotation.db.IdField;
+
+public class ArticleModel {
+    @IdField
     private Integer id;
 
     private String libelle;
+
+    private LocalDateTime datecreation;
+
+    public LocalDateTime getDatecreation() {
+        return datecreation;
+    }
+
+    public void setDatecreation(LocalDateTime datecreation) {
+        this.datecreation = datecreation;
+    }
 
     // FIFO, LIFO ou CUMP
     private String sigleGestionStock;

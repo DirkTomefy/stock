@@ -1,5 +1,6 @@
 package com.example.stock;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -75,6 +76,40 @@ public class StockApplication {
 		for (Object item : foundByOps) {
 			System.out.println(item);
 		}
+
+		// Test saveWithOneToMany
+		System.out.println("\n=== TEST SAVEWITHONETOMNAY ===");
+		Category categoryWithProducts = new Category();
+		categoryWithProducts.setName("Catégorie avec produits");
+		categoryWithProducts.setDescription("Test saveWithOneToMany");
+		
+		Product product1 = new Product();
+		product1.setName("Produit 1");
+		product1.setPrice(5.50);
+		product1.setStockQuantity(10);
+		product1.setCategory(categoryWithProducts);
+		
+		Product product2 = new Product();
+		product2.setName("Produit 2");
+		product2.setPrice(8.99);
+		product2.setStockQuantity(15);
+		product2.setCategory(categoryWithProducts);
+		
+		ArrayList<Product> products = new ArrayList<>();
+		products.add(product1);
+		products.add(product2);
+		categoryWithProducts.setProducts(products);
+		
+		dao.saveWithOneToMany(categoryWithProducts);
+		System.out.println("SAVEWITHONETOMNAY category => " + categoryWithProducts);
+
+		// Test updateWithOneToMany
+		System.out.println("\n=== TEST UPDATEWITHONETOMNAY ===");
+		product1.setPrice(6.99);
+		product2.setPrice(9.99);
+		
+		dao.updateWithOneToMany(categoryWithProducts);
+		System.out.println("UPDATEWITHONETOMNAY category => " + categoryWithProducts);
 
 		dao.delete(product);
 		System.out.println("DELETE product => id " + product.getId());

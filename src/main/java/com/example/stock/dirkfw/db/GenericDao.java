@@ -296,4 +296,68 @@ public class GenericDao {
         });
     }
 
+    public void saveWithOneToMany(Object o) throws Exception {
+        executeWithConnection(conn -> saveWithOneToMany(o, conn));
+    }
+
+    public void saveWithOneToMany(Object o, Connection conn) throws Exception {
+        // Save the parent object
+        save(o, conn);
+
+        // Save all OneToMany related objects
+        TableMap parentMap = getTableMapInfo(o.getClass());
+        OneToManyInfo[] oneToManyInfos = parentMap.getOneToManyInfos();
+
+        if (oneToManyInfos == null || oneToManyInfos.length == 0) {
+            return;
+        }
+
+        for (OneToManyInfo info : oneToManyInfos) {
+            Collection<?> childCollection = (Collection<?>) info.getGetter().invoke(o);
+            if (childCollection == null || childCollection.isEmpty()) {
+                continue;
+            }
+
+            for (Object child : childCollection) {
+                // Set the parent reference in the child
+                info.getChildSetter().invoke(child, o);
+
+                // Save the child
+                save(child, conn);
+            }
+        }
+    }
+
+    public void updateWithOneToMany(Object o) throws Exception {
+        executeWithConnection(conn -> updateWithOneToMany(o, conn));
+    }
+
+    public void updateWithOneToMany(Object o, Connection conn) throws Exception {
+        // Update the parent object
+        update(o, conn);
+
+        // Update all OneToMany related objects
+        TableMap parentMap = getTableMapInfo(o.getClass());
+        OneToManyInfo[] oneToManyInfos = parentMap.getOneToManyInfos();
+
+        if (oneToManyInfos == null || oneToManyInfos.length == 0) {
+            return;
+        }
+
+        for (OneToManyInfo info : oneToManyInfos) {
+            Collection<?> childCollection = (Collection<?>) info.getGetter().invoke(o);
+            if (childCollection == null || childCollection.isEmpty()) {
+                continue;
+            }
+
+            for (Object child : childCollection) {
+                // Set the parent reference in the child
+                info.getChildSetter().invoke(child, o);
+
+                // Update the child
+                update(child, conn);
+            }
+        }
+    }
+
 }

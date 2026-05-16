@@ -29,6 +29,7 @@ public class TableMap {
     private FieldInfo[] allFieldWithoutID;
     private FieldInfo fieldID;
     private Constructor<?> constructor;
+    private OneToManyInfo[] oneToManyInfos;
 
     // =========================
     // GETTERS / SETTERS
@@ -66,6 +67,14 @@ public class TableMap {
         this.fieldID = fieldID;
     }
 
+    public OneToManyInfo[] getOneToManyInfos() {
+        return oneToManyInfos;
+    }
+
+    public void setOneToManyInfos(OneToManyInfo[] oneToManyInfos) {
+        this.oneToManyInfos = oneToManyInfos;
+    }
+
     // =========================
     // CONSTRUCTOR
     // =========================
@@ -73,6 +82,7 @@ public class TableMap {
     public TableMap(Class<?> clazz) throws Exception {
         initializeTable(clazz);
         initializeFields(clazz);
+        initializeOneToManyFields(clazz);
     }
 
     // =========================
@@ -105,6 +115,58 @@ public class TableMap {
         }
 
         this.setAllFieldWithoutID(fieldInfos.toArray(new FieldInfo[0]));
+    }
+
+    private void initializeOneToManyFields(Class<?> clazz) throws Exception {
+        List<OneToManyInfo> oneToManyList = new ArrayList<>();
+
+        for (Field field : clazz.getDeclaredFields()) {
+            OneToMany annotation = field.getAnnotation(OneToMany.class);
+            if (annotation == null) {
+                continue;
+            }
+
+            Method getter = getterField(clazz, field);
+            Method setter = setterField(clazz, field);
+            
+            Class<?> childClass = getCollectionGenericType(field);
+            if (childClass != null) {
+                Field mappedByField = childClass.getDeclaredField(annotation.mappedBy());
+                Method childGetter = getterField(childClass, mappedByField);
+                Method childSetter = setterField(childClass, mappedByField);
+                OneToManyInfo info = new OneToManyInfo(
+                        field,
+                        getter,
+                        setter,
+                        mappedByField,
+                        childGetter,
+                        childSetter,
+                        annotation.mappedBy(),
+                        childClass);
+                oneToManyList.add(info);
+            }
+        }
+
+        this.setOneToManyInfos(oneToManyList.toArray(new OneToManyInfo[0]));
+    }
+
+    private Class<?> getCollectionGenericType(Field field) {
+        java.lang.reflect.Type genericType = field.getGenericType();
+        if (!(genericType instanceof java.lang.reflect.ParameterizedType)) {
+            return null;
+        }
+
+        java.lang.reflect.Type[] arguments = ((java.lang.reflect.ParameterizedType) genericType).getActualTypeArguments();
+        if (arguments.length == 0) {
+            return null;
+        }
+
+        java.lang.reflect.Type first = arguments[0];
+        if (first instanceof Class<?>) {
+            return (Class<?>) first;
+        }
+
+        return null;
     }
 
     private FieldInfo createFieldInfo(Class<?> clazz, Field field)

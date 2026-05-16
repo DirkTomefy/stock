@@ -158,4 +158,7 @@ public class QueryMaker {
         }
     }
 
+    public static String getQueryForHydrateOneToMany(TableMap parentMap, TableMap childMap, String foreignKeyColumn) {
+        return "SELECT * FROM " + childMap.getTableName() + " WHERE " + foreignKeyColumn + " = ?";
+    }
 }

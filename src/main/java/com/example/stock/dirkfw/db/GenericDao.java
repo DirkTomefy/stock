@@ -1,8 +1,5 @@
 package com.example.stock.dirkfw.db;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,7 +10,6 @@ import java.util.Vector;
 
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwConfig;
-import com.example.stock.dirkfw.annotation.db.OneToMany;
 import com.example.stock.dirkfw.db.query.*;
 import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
@@ -173,81 +169,38 @@ public class GenericDao {
     }
 
     private void hydrateOneToManyRelations(Object parent, Connection conn) throws Exception {
-        Class<?> parentClass = parent.getClass();
-        TableMap parentMap = getTableMapInfo(parentClass);
+        TableMap parentMap = getTableMapInfo(parent.getClass());
 
-        for (Field field : parentClass.getDeclaredFields()) {
-            OneToMany relation = field.getAnnotation(OneToMany.class);
-            if (relation == null) {
-                continue;
-            }
-
-            Class<?> childClass = getCollectionGenericType(field);
-            if (childClass == null) {
-                continue;
-            }
-
-            TableMap childMap = getTableMapInfo(childClass);
+        for (OneToManyInfo info : parentMap.getOneToManyInfos()) {
+            TableMap childMap = getTableMapInfo(info.getChildClass());
             if (childMap == null) {
                 continue;
             }
 
-            Field mappedByField = childClass.getDeclaredField(relation.mappedBy());
-            String foreignKeyColumn = FieldInfo.getTableColumnName(mappedByField);
+            String foreignKeyColumn = FieldInfo.getTableColumnName(info.getMappedByField());
 
             Object parentId = parentMap.getIdFieldValue(parent);
             if (parentId == null) {
-                setCollectionValue(parent, field, new ArrayList<>());
+                info.getSetter().invoke(parent, new ArrayList<>());
                 continue;
             }
 
             Vector<Object> children = new Vector<>();
-            String query = "SELECT * FROM " + childMap.getTableName() + " WHERE " + foreignKeyColumn + " = ?";
+            String query = QueryMaker.getQueryForHydrateOneToMany(parentMap, childMap, foreignKeyColumn) ;
 
             try (PreparedStatement preparedStatement = conn.prepareStatement(query)) {
                 preparedStatement.setObject(1, parentId);
 
                 try (ResultSet rs = preparedStatement.executeQuery()) {
                     while (rs.next()) {
-                        Object child = childMap.getConstructor().newInstance();
+                        Object child = info.getChildConstructor().newInstance();
                         childMap.mapResultIntoObject(child, rs);
                         children.add(child);
                     }
                 }
             }
 
-            setCollectionValue(parent, field, children);
-        }
-    }
-
-    private Class<?> getCollectionGenericType(Field field) {
-        Type genericType = field.getGenericType();
-        if (!(genericType instanceof ParameterizedType)) {
-            return null;
-        }
-
-        Type[] arguments = ((ParameterizedType) genericType).getActualTypeArguments();
-        if (arguments.length == 0) {
-            return null;
-        }
-
-        Type first = arguments[0];
-        if (first instanceof Class<?>) {
-            return (Class<?>) first;
-        }
-
-        return null;
-    }
-
-    private void setCollectionValue(Object parent, Field field, Collection<?> value) throws Exception {
-        String fieldName = field.getName();
-        String setterName = "set" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
-
-        try {
-            parent.getClass().getMethod(setterName, field.getType()).invoke(parent, value);
-        } catch (NoSuchMethodException ex) {
-            field.setAccessible(true);
-            field.set(parent, value);
+            info.getSetter().invoke(parent, children);
         }
     }
 
@@ -301,10 +254,7 @@ public class GenericDao {
     }
 
     public void saveWithOneToMany(Object o, Connection conn) throws Exception {
-        // Save the parent object
         save(o, conn);
-
-        // Save all OneToMany related objects
         TableMap parentMap = getTableMapInfo(o.getClass());
         OneToManyInfo[] oneToManyInfos = parentMap.getOneToManyInfos();
 
@@ -319,10 +269,7 @@ public class GenericDao {
             }
 
             for (Object child : childCollection) {
-                // Set the parent reference in the child
                 info.getChildSetter().invoke(child, o);
-
-                // Save the child
                 save(child, conn);
             }
         }
@@ -333,10 +280,8 @@ public class GenericDao {
     }
 
     public void updateWithOneToMany(Object o, Connection conn) throws Exception {
-        // Update the parent object
+        
         update(o, conn);
-
-        // Update all OneToMany related objects
         TableMap parentMap = getTableMapInfo(o.getClass());
         OneToManyInfo[] oneToManyInfos = parentMap.getOneToManyInfos();
 
@@ -349,12 +294,8 @@ public class GenericDao {
             if (childCollection == null || childCollection.isEmpty()) {
                 continue;
             }
-
             for (Object child : childCollection) {
-                // Set the parent reference in the child
                 info.getChildSetter().invoke(child, o);
-
-                // Update the child
                 update(child, conn);
             }
         }

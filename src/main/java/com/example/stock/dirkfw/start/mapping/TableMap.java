@@ -134,6 +134,7 @@ public class TableMap {
                 Field mappedByField = childClass.getDeclaredField(annotation.mappedBy());
                 Method childGetter = getterField(childClass, mappedByField);
                 Method childSetter = setterField(childClass, mappedByField);
+                java.lang.reflect.Constructor<?> childConstructor = childClass.getConstructor();
                 OneToManyInfo info = new OneToManyInfo(
                         field,
                         getter,
@@ -141,6 +142,7 @@ public class TableMap {
                         mappedByField,
                         childGetter,
                         childSetter,
+                    childConstructor,
                         annotation.mappedBy(),
                         childClass);
                 oneToManyList.add(info);

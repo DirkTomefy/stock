@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwConfig;
+import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
@@ -55,11 +56,8 @@ public class GenericFormPanel extends JPanel {
         add(createButtonPanel(), BorderLayout.SOUTH);
     }
 
-   
-
-    //TODO : à faire
     private boolean isDisplayable(Field field) {
-        return  !TableMap.isIdField(field);
+        return  !TableMap.isIdField(field) && field.isAnnotationPresent(IgnoreDisplayOpperation.class);
     }
 
     private void addField(FieldInfo fieldInfo, JPanel panel) {

@@ -2,6 +2,7 @@ package com.example.stock.dirkfw.db.util;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.time.LocalDateTime;
 
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
@@ -13,12 +14,19 @@ public class DBTypes {
         //primitive types
         types.put(int.class, java.sql.Types.INTEGER);
         types.put(double.class, java.sql.Types.DOUBLE); 
+        types.put(long.class, java.sql.Types.BIGINT);
+        types.put(float.class, java.sql.Types.REAL);
+        types.put(boolean.class, java.sql.Types.BOOLEAN);
 
         //wrapper types
         types.put(Integer.class, java.sql.Types.INTEGER);
         types.put(String.class, java.sql.Types.VARCHAR);
         types.put(Double.class, java.sql.Types.DOUBLE);
+        types.put(Long.class, java.sql.Types.BIGINT);
+        types.put(Float.class, java.sql.Types.REAL);
+        types.put(Boolean.class, java.sql.Types.BOOLEAN);
         types.put(java.util.Date.class, java.sql.Types.DATE);
+        types.put(LocalDateTime.class, java.sql.Types.TIMESTAMP);
         return types;
     }
 
@@ -51,6 +59,10 @@ public class DBTypes {
         } else if (sqlType == java.sql.Types.DATE) {
             java.sql.Date d = rs.getDate(columnName);
             value = (d != null) ? new java.util.Date(d.getTime()) : null;
+
+        } else if (sqlType == java.sql.Types.TIMESTAMP) {
+            java.sql.Timestamp ts = rs.getTimestamp(columnName);
+            value = (ts != null) ? ts.toLocalDateTime() : null;
 
         } else {
             throw new SQLException("Type SQL non supporté: " + sqlType);

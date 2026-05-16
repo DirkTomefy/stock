@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.reflections.scanners.SubTypesScanner;
 import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
+import com.example.stock.dirkfw.annotation.db.OneToMany;
 import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
@@ -216,7 +218,9 @@ public class TableMap {
     // =========================
 
     public static boolean isFieldOpperable(Field field) {
-        return !field.isAnnotationPresent(IgnoreDbOpperation.class);
+        return !field.isAnnotationPresent(IgnoreDbOpperation.class)
+                && !field.isAnnotationPresent(OneToMany.class)
+                && !Collection.class.isAssignableFrom(field.getType());
     }
 
     public static boolean isIdField(Field field) {

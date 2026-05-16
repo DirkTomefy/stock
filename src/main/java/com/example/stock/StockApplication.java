@@ -1,51 +1,70 @@
 package com.example.stock;
 
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import java.util.Vector;
 
 import com.example.stock.dirkfw.DirkFwConfig;
-import com.example.stock.dirkfw.display.classes.GenericFormPanel;
+import com.example.stock.context.DatabaseContext;
+import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.start.mapping.TableMap;
-import com.example.stock.model.ArticleModel;
+import com.example.stock.model.Category;
+import com.example.stock.model.Product;
 
 public class StockApplication {
 
-	public static void init() throws Exception{
+	public static void init() throws Exception {
 		DirkFwConfig.setClassInfos(TableMap.getAllClassFromPackage("com.example.stock.model"));
 	}
+
 	public static void main(String[] args) throws Exception {
 		init();
-		
-		// Test GenericFormPanel
-		ArticleModel article = new ArticleModel();
-		
-		MouseListener validateListener = new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				JOptionPane.showMessageDialog(null, "Formulaire validé !");
-			}
-			@Override
-			public void mousePressed(MouseEvent e) {}
-			@Override
-			public void mouseReleased(MouseEvent e) {}
-			@Override
-			public void mouseEntered(MouseEvent e) {}
-			@Override
-			public void mouseExited(MouseEvent e) {}
-		};
-		
-		GenericFormPanel formPanel = new GenericFormPanel(article, validateListener);
-		
-		JFrame frame = new JFrame("Gestion des Articles - Formulaire");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setResizable(true);
-		frame.add(formPanel);
-		frame.setSize(500, 400);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+
+		GenericDao dao = new GenericDao();
+		dao.dbctx = new DatabaseContext();
+
+		Category category = new Category();
+		category.setName("Catégorie CRUD");
+		category.setDescription("Test OneToMany côté db");
+		dao.save(category);
+		System.out.println("SAVE category => " + category);
+
+		Product product = new Product();
+		product.setName("Produit CRUD");
+		product.setPrice(10.50);
+		product.setStockQuantity(8);
+		product.setCategory(category);
+		dao.save(product);
+		System.out.println("SAVE product => " + product);
+
+		Category foundById = new Category();
+		foundById.setId(category.getId());
+		dao.findById(foundById);
+		System.out.println("FINDBYID category => " + foundById);
+		System.out.println("FINDBYID category.products size => "
+				+ (foundById.getProducts() == null ? 0 : foundById.getProducts().size()));
+
+		Product where = new Product();
+		where.setCategory(category);
+		Vector<Object> foundProducts = dao.find(where);
+		System.out.println("FIND products by category => " + foundProducts.size());
+		for (Object item : foundProducts) {
+			System.out.println(item);
+		}
+
+		product.setName("Produit CRUD modifié");
+		product.setPrice(12.75);
+		dao.update(product);
+		System.out.println("UPDATE product => " + product);
+
+		Product reloaded = new Product();
+		reloaded.setId(product.getId());
+		dao.findById(reloaded);
+		System.out.println("FINDBYID product => " + reloaded);
+
+		dao.delete(product);
+		System.out.println("DELETE product => id " + product.getId());
+
+		dao.delete(category);
+		System.out.println("DELETE category => id " + category.getId());
 	}
 
 }

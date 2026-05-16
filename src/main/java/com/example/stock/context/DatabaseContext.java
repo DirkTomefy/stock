@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class DatabaseContext {
 
     private final String URL =
-            "jdbc:postgresql://localhost:5432/stock";
+            "jdbc:postgresql://localhost:5432/test";
 
     private  final String USER =
             "postgres";

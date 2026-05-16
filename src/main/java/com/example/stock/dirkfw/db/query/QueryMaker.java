@@ -66,7 +66,12 @@ public class QueryMaker {
         StringBuilder whereClause = new StringBuilder();
 
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
-            Object value = fi.getFieldValue(where);
+            Object value;
+            try {
+                value = fi.getDatabaseValue(where);
+            } catch (Exception e) {
+                throw new ReflectiveOperationException(e);
+            }
             if (value != null) {
                 if (whereClause.length() == 0) {
                     whereClause.append(" WHERE ");

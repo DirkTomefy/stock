@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Vector;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -15,7 +16,9 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwConfig;
+import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 import com.example.stock.dirkfw.start.mapping.TableMap;
@@ -70,7 +73,9 @@ public class GenericFormPanel extends JPanel {
         label.setPreferredSize(new java.awt.Dimension(120, 30));
 
         DFWInput input;
-        if (isDateTimeField(fieldInfo.getReflectField())) {
+        if (fieldInfo.isManyToOne()) {
+            input = createManyToOneInput(fieldInfo);
+        } else if (isDateTimeField(fieldInfo.getReflectField())) {
             input = new DFWDateField(fieldInfo, object);
         } else {
             input = new DFWTextField(fieldInfo, object);
@@ -84,6 +89,20 @@ public class GenericFormPanel extends JPanel {
         
         panel.add(fieldPanel);
         panel.add(Box.createVerticalStrut(10));
+    }
+
+    private DFWInput createManyToOneInput(FieldInfo fieldInfo) {
+        Vector<Object> items = new Vector<>();
+
+        try {
+            GenericDao dao = new GenericDao();
+            dao.dbctx = new DatabaseContext();
+            items = dao.getAll(fieldInfo.getReflectField().getType());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new DFWComboBox(fieldInfo, object, items);
     }
     
     private boolean isDateTimeField(Field field) {

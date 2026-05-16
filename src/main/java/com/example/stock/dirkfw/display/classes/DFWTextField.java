@@ -43,6 +43,11 @@ public class DFWTextField extends JTextField implements DFWInput {
         Class<?> fieldType = fieldInfo.getReflectField().getType();
 
         try {
+            if (fieldInfo.isManyToOne()) {
+                Object idValue = parseSimpleValue(text, fieldInfo.getManyToOneIdType());
+                return fieldInfo.buildManyToOneValue(idValue);
+            }
+
             if (fieldType == String.class) {
                 return text;
             } else if (fieldType == Integer.class || fieldType == int.class) {
@@ -58,6 +63,29 @@ public class DFWTextField extends JTextField implements DFWInput {
             }
         } catch (NumberFormatException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return text;
+    }
+
+    private Object parseSimpleValue(String text, Class<?> type) {
+        try {
+            if (type == Integer.class || type == int.class) {
+                return Integer.parseInt(text);
+            } else if (type == Long.class || type == long.class) {
+                return Long.parseLong(text);
+            } else if (type == Double.class || type == double.class) {
+                return Double.parseDouble(text);
+            } else if (type == Float.class || type == float.class) {
+                return Float.parseFloat(text);
+            } else if (type == Boolean.class || type == boolean.class) {
+                return Boolean.parseBoolean(text);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return null;
         }
 
         return text;

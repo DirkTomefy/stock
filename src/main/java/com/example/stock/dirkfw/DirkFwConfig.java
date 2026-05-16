@@ -20,40 +20,4 @@ public class DirkFwConfig {
         DirkFwConfig.classInfos = classInfos;
     }
 
-    // @IgnoreDisplayOpperation
-    // @IgnoreDbOpperation
-    // GenericDao dao;
-
-
-    // public GenericDao getDao() {
-    //     return dao;
-    // }
-
-    // public void setDao(GenericDao dao) {
-    //     this.dao = dao;
-    // }
-
-    // public DirkFwObject(GenericDao dao) {
-    //     this.dao = dao;
-    // }
-
-    // public void save() throws Exception {
-    //     this.dao.save(this);
-    // }
-
-    // public void update() throws Exception {
-    //     this.dao.update(this);
-    // }
-
-    // public void delete() throws Exception {
-    //         this.dao.delete(this);
-    // }
-
-    // public void findById() throws Exception {
-    //     this.dao.findById(this);
-    // }
-
-    // public Vector<Object> getAll() throws Exception {
-    //     return this.dao.getAll(this);
-    // }
 }

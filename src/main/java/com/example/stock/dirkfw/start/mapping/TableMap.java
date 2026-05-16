@@ -14,7 +14,7 @@ import java.util.Set;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
-import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
 import com.example.stock.dirkfw.err.NoGetterAvailable;
@@ -199,8 +199,8 @@ public class TableMap {
         Reflections reflections =
                 new Reflections(packageName, new SubTypesScanner(false));
 
-        Set<Class<? extends DirkFwObject>> classes =
-                reflections.getSubTypesOf(DirkFwObject.class);
+        Set<Class<? extends DirkFwConfig>> classes =
+                reflections.getSubTypesOf(DirkFwConfig.class);
 
         System.out.println(classes.size());
 

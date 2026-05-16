@@ -6,33 +6,33 @@ import java.util.Vector;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class GenericTablePanel extends JTable {
 
-    private Vector<DirkFwObject> data;
+    private Vector<Object> data;
 
     public GenericTablePanel() {
         this(new Vector<>());
     }
 
-    public GenericTablePanel(Vector<DirkFwObject> data) {
+    public GenericTablePanel(Vector<Object> data) {
         super();
         setData(data);
     }
 
-    public void setData(Vector<DirkFwObject> data) {
+    public void setData(Vector<Object> data) {
         this.data = data == null ? new Vector<>() : data;
         rebuildModel();
     }
 
-    public Vector<DirkFwObject> getData() {
+    public Vector<Object> getData() {
         return data;
     }
 
-    public DirkFwObject getRowObject(int rowIndex) {
+    public Object getRowObject(int rowIndex) {
         return (rowIndex >= 0 && rowIndex < data.size()) ? data.get(rowIndex) : null;
     }
 
@@ -61,8 +61,8 @@ public class GenericTablePanel extends JTable {
     }
 
     private TableMap getTableMapForFirstObject() {
-        DirkFwObject first = data.firstElement();
-        return DirkFwObject.getClassInfos().get(first.getClass().getName());
+        Object  first = data.firstElement();
+        return DirkFwConfig.getClassInfos().get(first.getClass().getName());
     }
 
     private Vector<String> buildColumnHeaders(TableMap tableMap) {
@@ -87,13 +87,13 @@ public class GenericTablePanel extends JTable {
         }
 
         // add data rows
-        for (DirkFwObject obj : data) {
+        for (Object obj : data) {
             Vector<Object> row = extractRowData(tableMap, columnNames.size(), obj);
             model.addRow(row);
         }
     }
 
-    private Vector<Object> extractRowData(TableMap tableMap, int expectedSize, DirkFwObject obj) {
+    private Vector<Object> extractRowData(TableMap tableMap, int expectedSize, Object obj) {
         Vector<Object> row = new Vector<>();
 
         try {

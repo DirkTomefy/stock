@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.util.Vector;
 
 import com.example.stock.context.DatabaseContext;
-import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.db.query.*;
 import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
@@ -33,11 +33,11 @@ public class GenericDao {
     }
 
     public static TableMap getTableMapInfo(Class<?> clazz) {
-        return DirkFwObject.classInfos.get(clazz.getName());
+        return DirkFwConfig.classInfos.get(clazz.getName());
     }
 
     public static TableMap getTableMapInfo(String clazz) {
-        return DirkFwObject.classInfos.get(clazz);
+        return DirkFwConfig.classInfos.get(clazz);
     }
 
     public void update(Object o)

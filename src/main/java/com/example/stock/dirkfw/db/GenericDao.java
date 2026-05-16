@@ -10,7 +10,6 @@ import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.db.query.*;
 import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
-import com.example.stock.dirkfw.start.reflect.ReflectManager;
 
 public class GenericDao {
     public DatabaseContext dbctx;
@@ -73,7 +72,7 @@ public class GenericDao {
                 ResultSet result = preparedStatement.executeQuery()) {
             while (result.next()) {
                 Object obj = tableMap.getConstructor().newInstance();
-                ReflectManager.mapResultIntoObject(obj, result, tableMap);
+                tableMap.mapResultIntoObject(obj, result);
                 lo.add(obj);
             }
         }
@@ -97,7 +96,7 @@ public class GenericDao {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Object obj = tableMap.getConstructor().newInstance();
-                    ReflectManager.mapResultIntoObject(obj, rs, tableMap);
+                    tableMap.mapResultIntoObject(obj, rs);
                     results.add(obj);
                 }
             }
@@ -147,7 +146,7 @@ public class GenericDao {
             preparedStatement.setObject(1, idValue);
             try (ResultSet result = preparedStatement.executeQuery()) {
                 if (result.next()) {
-                    ReflectManager.mapResultIntoObject(o, result, tableMap);
+                    tableMap.mapResultIntoObject(o, result);
                 }
             }
         }

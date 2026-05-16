@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
-import com.example.stock.dirkfw.start.reflect.ReflectManager;
+import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class GenericFormPanel extends JPanel {
 
@@ -54,9 +54,9 @@ public class GenericFormPanel extends JPanel {
 
    
 
+    //TODO : à faire
     private boolean isDisplayable(Field field) {
-        return ReflectManager.isFieldOpperable(field)
-                && !ReflectManager.isIdField(field);
+        return  !TableMap.isIdField(field);
     }
 
     private void addField(FieldInfo fieldInfo, JPanel panel) {

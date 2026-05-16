@@ -1,13 +1,36 @@
 package com.example.stock.dirkfw.start.mapping;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+
+import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.annotation.db.IdField;
+import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
+import com.example.stock.dirkfw.err.NoGetterAvailable;
+import com.example.stock.dirkfw.err.NoSetterAvailable;
+import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
 public class TableMap {
-    String tableName;
-    FieldInfo[] allFieldWithoutID;
-    FieldInfo fieldID;
-    Constructor<?> constructor;
+
+    private String tableName;
+    private FieldInfo[] allFieldWithoutID;
+    private FieldInfo fieldID;
+    private Constructor<?> constructor;
+
+    // =========================
+    // GETTERS / SETTERS
+    // =========================
 
     public Constructor<?> getConstructor() {
         return constructor;
@@ -29,8 +52,6 @@ public class TableMap {
         return allFieldWithoutID;
     }
 
-    
-
     public void setAllFieldWithoutID(FieldInfo[] allFieldWithoutID) {
         this.allFieldWithoutID = allFieldWithoutID;
     }
@@ -43,10 +64,154 @@ public class TableMap {
         this.fieldID = fieldID;
     }
 
-    public  Object getIdFieldValue( Object o)
+    // =========================
+    // CONSTRUCTOR
+    // =========================
+
+    public TableMap(Class<?> clazz) throws Exception {
+        initializeTable(clazz);
+        initializeFields(clazz);
+    }
+
+    // =========================
+    // INITIALIZATION
+    // =========================
+
+    private void initializeTable(Class<?> clazz) throws NoSuchMethodException {
+        this.setTableName(clazz.getSimpleName());
+        this.setConstructor(clazz.getConstructor());
+    }
+
+    private void initializeFields(Class<?> clazz)
+            throws NoGetterAvailable, NoSetterAvailable {
+
+        List<FieldInfo> fieldInfos = new ArrayList<>();
+
+        for (Field field : clazz.getDeclaredFields()) {
+
+            if (!isFieldOpperable(field)) {
+                continue;
+            }
+
+            FieldInfo fieldInfo = createFieldInfo(clazz, field);
+
+            if (isIdField(field)) {
+                this.setFieldID(fieldInfo);
+            } else {
+                fieldInfos.add(fieldInfo);
+            }
+        }
+
+        this.setAllFieldWithoutID(fieldInfos.toArray(new FieldInfo[0]));
+    }
+
+    private FieldInfo createFieldInfo(Class<?> clazz, Field field)
+            throws NoGetterAvailable, NoSetterAvailable {
+
+        return new FieldInfo(
+                field,
+                getterField(clazz, field),
+                setterField(clazz, field));
+    }
+
+    // =========================
+    // OBJECT MAPPING
+    // =========================
+
+    public Object getIdFieldValue(Object o)
             throws IllegalAccessException, InvocationTargetException {
+
         return this.getFieldID().getFieldValue(o);
     }
 
-    
+    public void mapResultIntoObject(
+            Object toFill,
+            ResultSet result)
+            throws ReflectiveOperationException,
+            SQLException,
+            NoSetterAvailable,
+            NonSqlTypeErr {
+
+        for (FieldInfo fieldInfo : this.getAllFieldWithoutID()) {
+            fieldInfo.mapResultColumnIntoField(toFill, result);
+        }
+
+        this.getFieldID().mapResultColumnIntoField(toFill, result);
+    }
+
+   
+
+    // =========================
+    // REFLECTION METHODS
+    // =========================
+
+    public static Method getterField(Class<?> clazz, Field field)
+            throws NoGetterAvailable {
+
+        String fieldName = field.getName();
+
+        String methodName =
+                "get"
+                        + fieldName.substring(0, 1).toUpperCase()
+                        + fieldName.substring(1);
+
+        try {
+            return clazz.getMethod(methodName);
+        } catch (NoSuchMethodException ex) {
+            throw new NoGetterAvailable(fieldName, clazz.getName(), ex);
+        }
+    }
+
+    public static Method setterField(Class<?> clazz, Field field)
+            throws NoSetterAvailable {
+
+        String fieldName = field.getName();
+
+        String methodName =
+                "set"
+                        + fieldName.substring(0, 1).toUpperCase()
+                        + fieldName.substring(1);
+
+        try {
+            return clazz.getMethod(methodName, field.getType());
+        } catch (NoSuchMethodException ex) {
+            throw new NoSetterAvailable(fieldName, clazz.getName(), ex);
+        }
+    }
+
+    // =========================
+    // PACKAGE SCAN
+    // =========================
+
+    public static HashMap<String, TableMap> getAllClassFromPackage(String packageName)
+            throws Exception {
+
+        HashMap<String, TableMap> result = new HashMap<>();
+
+        Reflections reflections =
+                new Reflections(packageName, new SubTypesScanner(false));
+
+        Set<Class<? extends DirkFwObject>> classes =
+                reflections.getSubTypesOf(DirkFwObject.class);
+
+        System.out.println(classes.size());
+
+        for (Class<?> clazz : classes) {
+            result.put(clazz.getName(), new TableMap(clazz));
+        }
+
+        return result;
+    }
+
+    // =========================
+    // FIELD VALIDATION
+    // =========================
+
+    public static boolean isFieldOpperable(Field field) {
+        return !field.isAnnotationPresent(IgnoreDbOpperation.class);
+    }
+
+    public static boolean isIdField(Field field) {
+        return field.isAnnotationPresent(IdField.class);
+    }
 }

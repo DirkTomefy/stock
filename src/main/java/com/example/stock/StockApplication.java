@@ -8,13 +8,13 @@ import javax.swing.JOptionPane;
 
 import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.display.classes.GenericFormPanel;
-import com.example.stock.dirkfw.start.reflect.ReflectManager;
+import com.example.stock.dirkfw.start.mapping.TableMap;
 import com.example.stock.model.ArticleModel;
 
 public class StockApplication {
 
 	public static void init() throws Exception{
-		DirkFwObject.setClassInfos(ReflectManager.getAllClassFromPackage("com.example.stock.model"));
+		DirkFwObject.setClassInfos(TableMap.getAllClassFromPackage("com.example.stock.model"));
 	}
 	public static void main(String[] args) throws Exception {
 		init();

@@ -65,7 +65,7 @@ public class GenericFormPanel extends JPanel {
         fieldPanel.setBackground(new Color(245, 245, 245));
         fieldPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 50));
 
-        JLabel label = new JLabel(fieldInfo.getDFWName());
+        JLabel label = new JLabel(fieldInfo.getTableColumnName());
         label.setFont(new Font("Arial", Font.PLAIN, 12));
         label.setPreferredSize(new java.awt.Dimension(120, 30));
 
@@ -77,7 +77,7 @@ public class GenericFormPanel extends JPanel {
         }
         ((JComponent) input).setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 40));
 
-        this.inputs.put(fieldInfo.getDFWName(), input);
+        this.inputs.put(fieldInfo.getTableColumnName(), input);
         fieldPanel.add(label);
         fieldPanel.add(Box.createHorizontalStrut(10));
         fieldPanel.add((JComponent)input);

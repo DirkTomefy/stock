@@ -40,10 +40,6 @@ public class FieldInfo {
         this.reflectField = reflectField;
     }
 
-    public String getDFWName(){
-        return this.getTableColumnName();
-    }
-
     public void setGetter(Method getter) {
         this.getter = getter;
     }

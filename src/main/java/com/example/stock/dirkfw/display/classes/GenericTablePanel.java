@@ -74,7 +74,7 @@ public class GenericTablePanel extends JTable {
         }
 
         for (FieldInfo field : tableMap.getAllFieldWithoutID()) {
-            columns.add(field.getDFWName());
+            columns.add(field.getTableColumnName());
         }
 
         return columns;

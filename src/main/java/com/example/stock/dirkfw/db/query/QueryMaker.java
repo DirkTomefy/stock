@@ -11,7 +11,7 @@ public class QueryMaker {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) builder.append(separator);
-            builder.append(fields[i].getDFWName());
+            builder.append(fields[i].getTableColumnName());
         }
         return builder.toString();
     }
@@ -38,9 +38,9 @@ public class QueryMaker {
         StringBuilder setClause = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             if (i > 0) setClause.append(", ");
-            setClause.append(fields[i].getDFWName()).append(" = ?");
+            setClause.append(fields[i].getTableColumnName()).append(" = ?");
         }
-        String idField = tableMap.getFieldID().getDFWName();
+        String idField = tableMap.getFieldID().getTableColumnName();
         return "UPDATE " + tableMap.getTableName() + " SET " + setClause + " WHERE " + idField + " = ?";
     }
 
@@ -49,12 +49,12 @@ public class QueryMaker {
     }
 
     public static String getQueryForDelete(TableMap tableMap) {
-        String idField = tableMap.getFieldID().getDFWName();
+        String idField = tableMap.getFieldID().getTableColumnName();
         return "DELETE FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForFindByID(TableMap tableMap) {
-        String idField = tableMap.getFieldID().getDFWName();
+        String idField = tableMap.getFieldID().getTableColumnName();
         return "SELECT * FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
     }
 
@@ -73,7 +73,7 @@ public class QueryMaker {
                 } else {
                     whereClause.append(" AND ");
                 }
-                whereClause.append(fi.getDFWName()).append(" = ?");
+                whereClause.append(fi.getTableColumnName()).append(" = ?");
             }
         }
 
@@ -84,7 +84,7 @@ public class QueryMaker {
             } else {
                 whereClause.append(" AND ");
             }
-            whereClause.append(tableMap.getFieldID().getDFWName()).append(" = ?");
+            whereClause.append(tableMap.getFieldID().getTableColumnName()).append(" = ?");
         }
 
         query.append(whereClause);

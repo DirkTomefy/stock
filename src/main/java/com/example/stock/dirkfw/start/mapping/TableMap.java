@@ -78,7 +78,7 @@ public class TableMap {
     // =========================
 
     private void initializeTable(Class<?> clazz) throws NoSuchMethodException {
-        this.setTableName(clazz.getSimpleName());
+        this.setTableName(getTableNameFromAnnotation(clazz));
         this.setConstructor(clazz.getConstructor());
     }
 
@@ -112,6 +112,14 @@ public class TableMap {
                 field,
                 getterField(clazz, field),
                 setterField(clazz, field));
+    }
+
+    private String getTableNameFromAnnotation(Class<?> clazz) {
+        if (clazz.isAnnotationPresent(com.example.stock.dirkfw.annotation.db.TableName.class)) {
+            return clazz.getAnnotation(com.example.stock.dirkfw.annotation.db.TableName.class).value();
+        } else {
+            return clazz.getSimpleName();
+        }
     }
 
     // =========================

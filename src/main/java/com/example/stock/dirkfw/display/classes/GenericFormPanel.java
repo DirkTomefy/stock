@@ -15,18 +15,18 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class GenericFormPanel extends JPanel {
 
-    private final DirkFwObject object;
+    private final Object object;
     private HashMap<String, DFWInput> inputs;
     private MouseListener validateFormListener;
 
-    public GenericFormPanel(DirkFwObject object,MouseListener validateFormListener) {
+    public GenericFormPanel(Object object,MouseListener validateFormListener) {
         setLayout(new BorderLayout(10, 10));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setBackground(new Color(245, 245, 245));
@@ -40,7 +40,7 @@ public class GenericFormPanel extends JPanel {
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
         fieldsPanel.setBackground(new Color(245, 245, 245));
 
-        FieldInfo[] fields =  DirkFwObject.getClassInfos().get(object.getClass().getName()).getAllFieldWithoutID();
+        FieldInfo[] fields =  DirkFwConfig.getClassInfos().get(object.getClass().getName()).getAllFieldWithoutID();
 
         for (FieldInfo fieldInfo : fields) {
             if(isDisplayable(fieldInfo.getReflectField())) {

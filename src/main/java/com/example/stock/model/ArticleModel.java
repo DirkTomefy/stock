@@ -1,11 +1,9 @@
 package com.example.stock.model;
 
 import java.time.LocalDateTime;
-
-import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.annotation.db.IdField;
 
-public class ArticleModel extends DirkFwObject{
+public class ArticleModel {
     @IdField
     private Integer id;
 
@@ -24,15 +22,16 @@ public class ArticleModel extends DirkFwObject{
     // FIFO, LIFO ou CUMP
     private String sigleGestionStock;
 
-    public ArticleModel() {
-        super(null);
-    }
+    
 
     public ArticleModel(Integer id, String libelle, String sigleGestionStock) {
-        super(null);
         this.id = id;
         this.libelle = libelle;
         this.sigleGestionStock = sigleGestionStock;
+    }
+
+    public ArticleModel() {
+        
     }
 
     public Integer getId() {

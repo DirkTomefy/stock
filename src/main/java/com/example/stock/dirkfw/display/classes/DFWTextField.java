@@ -2,24 +2,23 @@ package com.example.stock.dirkfw.display.classes;
 
 import javax.swing.JTextField;
 
-import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 
 public class DFWTextField extends JTextField implements DFWInput {
 
     private FieldInfo fieldInfo;
-    private DirkFwObject object;
+    private Object object;
 
-    public DirkFwObject getObject() {
+    public Object getObject() {
         return object;
     }
 
-    public void setObject(DirkFwObject object) {
+    public void setObject(Object object) {
         this.object = object;
     }
 
-    public DFWTextField(FieldInfo fieldInfo, DirkFwObject object) {
+    public DFWTextField(FieldInfo fieldInfo, Object object) {
         super();
         this.fieldInfo = fieldInfo;
         this.object = object;

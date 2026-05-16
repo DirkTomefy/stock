@@ -8,7 +8,6 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.swing.BoxLayout;
 
-import com.example.stock.dirkfw.DirkFwObject;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 import java.util.Date;
@@ -18,13 +17,13 @@ public class DFWDateField extends JPanel implements DFWInput {
     
     private FieldInfo fieldInfo;
 
-    private DirkFwObject object;
+    private Object object;
     
-    public DirkFwObject getObject() {
+    public Object getObject() {
         return object;
     }
 
-    public void setObject(DirkFwObject object) {
+    public void setObject(Object object) {
         this.object = object;
     }
 
@@ -35,7 +34,7 @@ public class DFWDateField extends JPanel implements DFWInput {
         return formatter;
     }
 
-    public DFWDateField(FieldInfo fieldInfo, DirkFwObject object) {
+    public DFWDateField(FieldInfo fieldInfo, Object object) {
         super();
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         

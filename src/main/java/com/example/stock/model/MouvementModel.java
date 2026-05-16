@@ -3,9 +3,9 @@ package com.example.stock.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.stock.dirkfw.DirkFwObject;
+import com.example.stock.dirkfw.DirkFwConfig;
 
-public class MouvementModel extends DirkFwObject{
+public class MouvementModel extends DirkFwConfig{
 
     private Integer id;
     private Integer idArticle;
@@ -28,7 +28,7 @@ public class MouvementModel extends DirkFwObject{
     private BigDecimal cump;
 
     public MouvementModel() {
-        super(null);
+        
     }
 
     public MouvementModel(Integer id, Integer idArticle, String type,
@@ -38,8 +38,6 @@ public class MouvementModel extends DirkFwObject{
                           BigDecimal qteStock,
                           BigDecimal moneyValueStock,
                           BigDecimal cump) {
-        super(null);
-
         this.id = id;
         this.idArticle = idArticle;
         this.type = type;

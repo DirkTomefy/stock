@@ -1,6 +1,8 @@
 package com.example.stock.dirkfw.db.query;
 
+import java.util.HashMap;
 
+import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.dirkfw.err.db.NoFieldIDErr;
 import com.example.stock.dirkfw.start.mapping.*;
 
@@ -94,6 +96,66 @@ public class QueryMaker {
 
         query.append(whereClause);
         return query.toString();
+    }
+
+    public static String getQueryForSelectWhereWithOperations(TableMap tableMap, Object where,
+            HashMap<String, ComparaisonOperation> operations)
+            throws ReflectiveOperationException {
+
+        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableMap.getTableName());
+        StringBuilder whereClause = new StringBuilder();
+
+        for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
+            Object value;
+            try {
+                value = fi.getDatabaseValue(where);
+            } catch (Exception e) {
+                throw new ReflectiveOperationException(e);
+            }
+            if (value != null) {
+                if (whereClause.length() == 0) {
+                    whereClause.append(" WHERE ");
+                } else {
+                    whereClause.append(" AND ");
+                }
+                
+                ComparaisonOperation op = operations.getOrDefault(fi.getTableColumnName(), ComparaisonOperation.EQ);
+                whereClause.append(fi.getTableColumnName()).append(" ").append(getOperatorSymbol(op)).append(" ?");
+            }
+        }
+
+         Object idValue = tableMap.getIdFieldValue(where);
+         if (idValue != null) {
+            if (whereClause.length() == 0) {
+                whereClause.append(" WHERE ");
+            } else {
+                whereClause.append(" AND ");
+            }
+            ComparaisonOperation op = operations.getOrDefault(tableMap.getFieldID().getTableColumnName(), ComparaisonOperation.EQ);
+            whereClause.append(tableMap.getFieldID().getTableColumnName()).append(" ").append(getOperatorSymbol(op)).append(" ?");
+        }
+
+        query.append(whereClause);
+        return query.toString();
+    }
+
+    private static String getOperatorSymbol(ComparaisonOperation op) {
+        switch (op) {
+            case INF:
+                return "<";
+            case SUP:
+                return ">";
+            case INFEQ:
+                return "<=";
+            case SUPEQ:
+                return ">=";
+            case EQ:
+                return "=";
+            case NEQ:
+                return "!=";
+            default:
+                return "=";
+        }
     }
 
 }

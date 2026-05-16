@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.example.stock.context.DatabaseContext;
@@ -64,6 +65,38 @@ public class GenericDao {
     public Vector<Object> find(Object where)
             throws Exception {
         return getAll(where);
+    }
+
+    public Vector<Object> findAll(Object e, HashMap<String, ComparaisonOperation> operations)
+            throws Exception {
+        return executeQueryWithConnection(conn -> findAll(e, operations, conn));
+    }
+
+    public Vector<Object> findAll(Object e, HashMap<String, ComparaisonOperation> operations, Connection conn)
+            throws Exception {
+
+        Vector<Object> results = new Vector<>();
+
+        Class<?> clazz = e.getClass();
+        TableMap tableMap = getTableMapInfo(clazz);
+
+        String query = QueryMaker.getQueryForSelectWhereWithOperations(tableMap, e, operations);
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            QueryFiller.fillWhereWithOperations(pstmt, tableMap, e, operations);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Object obj = tableMap.getConstructor().newInstance();
+                    tableMap.mapResultIntoObject(obj, rs);
+                    hydrateOneToManyRelations(obj, conn);
+                    results.add(obj);
+                }
+            }
+        }
+
+        return results;
     }
 
     public void findById(Object e)

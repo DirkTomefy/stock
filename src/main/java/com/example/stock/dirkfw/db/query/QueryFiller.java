@@ -1,7 +1,9 @@
 package com.example.stock.dirkfw.db.query;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 
+import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.dirkfw.db.util.FieldProcessor;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 import com.example.stock.dirkfw.start.mapping.*;
@@ -56,5 +58,28 @@ public class QueryFiller {
             }
             return idx;
         });
+    }
+
+    public static int fillWhereWithOperations(PreparedStatement pstmt, TableMap tableMap, Object where,
+            HashMap<String, ComparaisonOperation> operations)
+        throws ReflectiveOperationException, SQLException, NonSqlTypeErr {
+        
+        int index = 1;
+
+        for (FieldInfo fInfo : tableMap.getAllFieldWithoutID()) {
+            Object value = fInfo.getDatabaseValue(where);
+            if (value != null) {
+                pstmt.setObject(index, value);
+                index++;
+            }
+        }
+
+        Object idValue = tableMap.getIdFieldValue(where);
+        if (idValue != null) {
+            pstmt.setObject(index, idValue);
+            index++;
+        }
+
+        return index;
     }
 }

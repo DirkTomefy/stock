@@ -1,8 +1,10 @@
 package com.example.stock;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.example.stock.dirkfw.DirkFwConfig;
+import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.start.mapping.TableMap;
@@ -59,6 +61,20 @@ public class StockApplication {
 		reloaded.setId(product.getId());
 		dao.findById(reloaded);
 		System.out.println("FINDBYID product => " + reloaded);
+
+		// Test du nouveau findAll avec opérateurs de comparaison
+		System.out.println("\n=== TEST FINDALL AVEC OPÉRATEURS ===");
+		Product queryWithOps = new Product();
+		queryWithOps.setPrice(11.0);  // Chercher les produits avec price > 11.0
+		queryWithOps.setName("Eau minérale");
+		HashMap<String, ComparaisonOperation> operations = new HashMap<>();
+		operations.put("price", ComparaisonOperation.INF);  // price > ?
+		
+		Vector<Object> foundByOps = dao.findAll(queryWithOps, operations);
+		System.out.println("FINDALL products with price < 11.0 => " + foundByOps.size());
+		for (Object item : foundByOps) {
+			System.out.println(item);
+		}
 
 		dao.delete(product);
 		System.out.println("DELETE product => id " + product.getId());

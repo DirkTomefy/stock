@@ -16,6 +16,19 @@ import com.example.stock.dirkfw.start.mapping.*;
 
 public class GenericDao implements AutoCloseable {
     public DatabaseContext dbctx;
+    private String alterName;
+
+    public String getAlterName() {
+        return alterName;
+    }
+
+    public void setAlterName(String alterName) {
+        this.alterName = alterName;
+    }
+
+    private String getQueryTableName(TableMap tableMap) {
+        return alterName != null ? alterName : tableMap.getTableName();
+    }
 
     private void executeWithConnection(ConnectionOperation operation) throws Exception {
         try (Connection conn = dbctx.getConnection()) {
@@ -76,7 +89,7 @@ public class GenericDao implements AutoCloseable {
         Class<?> clazz = e.getClass();
         TableMap tableMap = getTableMapInfo(clazz);
 
-        String query = QueryMaker.getQueryForSelectWhereWithOperations(tableMap, e, operations);
+        String query = QueryMaker.getQueryForSelectWhereWithOperations(tableMap, getQueryTableName(tableMap), e, operations);
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
 
@@ -107,7 +120,7 @@ public class GenericDao implements AutoCloseable {
             throws Exception {
         Vector<Object> lo = new Vector<>();
         TableMap tableMap = getTableMapInfo(clazz);
-        String request = QueryMaker.getQueryForGetAll(tableMap);
+        String request = QueryMaker.getQueryForGetAll(tableMap, getQueryTableName(tableMap));
         try (PreparedStatement preparedStatement = conn.prepareStatement(request);
                 ResultSet result = preparedStatement.executeQuery()) {
             while (result.next()) {
@@ -128,7 +141,7 @@ public class GenericDao implements AutoCloseable {
         Class<?> clazz = where.getClass();
         TableMap tableMap = getTableMapInfo(clazz);
 
-        String query = QueryMaker.getQueryForSelectWhere(tableMap, where);
+        String query = QueryMaker.getQueryForSelectWhere(tableMap, getQueryTableName(tableMap), where);
 
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
 
@@ -151,7 +164,7 @@ public class GenericDao implements AutoCloseable {
             throws Exception {
 
         TableMap tableMap = getTableMapInfo(o.getClass());
-        String request = QueryMaker.getQueryForInsert(tableMap, o);
+        String request = QueryMaker.getQueryForInsert(tableMap, getQueryTableName(tableMap), o);
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(request,
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -207,7 +220,7 @@ public class GenericDao implements AutoCloseable {
     public void delete(Object o, Connection conn) throws Exception {
         TableMap tableMap = getTableMapInfo(o.getClass());
         Object idValue = tableMap.getIdFieldValue(o);
-        String request = QueryMaker.getQueryForDelete(tableMap);
+        String request = QueryMaker.getQueryForDelete(tableMap, getQueryTableName(tableMap));
         try (PreparedStatement preparedStatement = conn.prepareStatement(request)) {
             preparedStatement.setObject(1, idValue);
             preparedStatement.executeUpdate();
@@ -218,7 +231,7 @@ public class GenericDao implements AutoCloseable {
             throws Exception {
         TableMap tableMap = getTableMapInfo(o.getClass());
         Object idValue = tableMap.getIdFieldValue(o);
-        String request = QueryMaker.getQueryForFindByID(tableMap);
+        String request = QueryMaker.getQueryForFindByID(tableMap, getQueryTableName(tableMap));
 
         try (PreparedStatement preparedStatement = conn.prepareStatement(request)) {
             preparedStatement.setObject(1, idValue);
@@ -234,7 +247,7 @@ public class GenericDao implements AutoCloseable {
             throws Exception {
         TableMap tableMap = getTableMapInfo(o.getClass());
         Object idValue = tableMap.getIdFieldValue(o);
-        String request = QueryMaker.getQueryForUpdate(tableMap, o);
+        String request = QueryMaker.getQueryForUpdate(tableMap, getQueryTableName(tableMap), o);
         try (PreparedStatement preparedStatement = conn.prepareStatement(request)) {
             int i = QueryFiller.fillpstmtForUpdates(preparedStatement, tableMap, o);
             preparedStatement.setObject(i, idValue);

@@ -1,4 +1,4 @@
-package com.example.stock.model;
+package com.example.stock.mvc.model;
 import java.time.LocalDateTime;
 
 import com.example.stock.dirkfw.annotation.db.IdField;

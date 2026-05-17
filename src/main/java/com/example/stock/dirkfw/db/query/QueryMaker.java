@@ -28,13 +28,22 @@ public class QueryMaker {
     }
 
     public static String getQueryForInsert(TableMap tableMap, Object o) {
+        return getQueryForInsert(tableMap, tableMap.getTableName(), o);
+    }
+
+    public static String getQueryForInsert(TableMap tableMap, String tableName, Object o) {
         FieldInfo[] fields = tableMap.getAllFieldWithoutID();
         String columns = buildColumnList(fields, ", ");
         String placeholders = buildPlaceholderList(fields);
-        return "INSERT INTO " + tableMap.getTableName() + " (" + columns + ") VALUES (" + placeholders + ")";
+        return "INSERT INTO " + tableName + " (" + columns + ") VALUES (" + placeholders + ")";
     }
 
     public static String getQueryForUpdate(TableMap tableMap, Object o)
+            throws NoFieldIDErr {
+        return getQueryForUpdate(tableMap, tableMap.getTableName(), o);
+    }
+
+    public static String getQueryForUpdate(TableMap tableMap, String tableName, Object o)
             throws NoFieldIDErr {
         FieldInfo[] fields = tableMap.getAllFieldWithoutID();
         StringBuilder setClause = new StringBuilder();
@@ -43,28 +52,46 @@ public class QueryMaker {
             setClause.append(fields[i].getTableColumnName()).append(" = ?");
         }
         String idField = tableMap.getFieldID().getTableColumnName();
-        return "UPDATE " + tableMap.getTableName() + " SET " + setClause + " WHERE " + idField + " = ?";
+        return "UPDATE " + tableName + " SET " + setClause + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForGetAll(TableMap tableMap) {
-        return "SELECT * FROM " + tableMap.getTableName();
+        return getQueryForGetAll(tableMap, tableMap.getTableName());
+    }
+
+    public static String getQueryForGetAll(TableMap tableMap, String tableName) {
+        return "SELECT * FROM " + tableName;
     }
 
     public static String getQueryForDelete(TableMap tableMap) {
+        return getQueryForDelete(tableMap, tableMap.getTableName());
+    }
+
+    public static String getQueryForDelete(TableMap tableMap, String tableName) {
         String idField = tableMap.getFieldID().getTableColumnName();
-        return "DELETE FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
+        return "DELETE FROM " + tableName + " WHERE " + idField + " = ?";
     }
 
     public static String getQueryForFindByID(TableMap tableMap) {
+        return getQueryForFindByID(tableMap, tableMap.getTableName());
+    }
+
+    public static String getQueryForFindByID(TableMap tableMap, String tableName) {
         String idField = tableMap.getFieldID().getTableColumnName();
-        return "SELECT * FROM " + tableMap.getTableName() + " WHERE " + idField + " = ?";
+        return "SELECT * FROM " + tableName + " WHERE " + idField + " = ?";
     }
 
     
     public static String getQueryForSelectWhere(TableMap tableMap, Object where)
             throws ReflectiveOperationException {
 
-        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableMap.getTableName());
+        return getQueryForSelectWhere(tableMap, tableMap.getTableName(), where);
+    }
+
+    public static String getQueryForSelectWhere(TableMap tableMap, String tableName, Object where)
+            throws ReflectiveOperationException {
+
+        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableName);
         StringBuilder whereClause = new StringBuilder();
 
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
@@ -102,7 +129,14 @@ public class QueryMaker {
             HashMap<String, ComparaisonOperation> operations)
             throws ReflectiveOperationException {
 
-        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableMap.getTableName());
+        return getQueryForSelectWhereWithOperations(tableMap, tableMap.getTableName(), where, operations);
+    }
+
+    public static String getQueryForSelectWhereWithOperations(TableMap tableMap, String tableName, Object where,
+            HashMap<String, ComparaisonOperation> operations)
+            throws ReflectiveOperationException {
+
+        StringBuilder query = new StringBuilder("SELECT * FROM ").append(tableName);
         StringBuilder whereClause = new StringBuilder();
 
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {

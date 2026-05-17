@@ -1,8 +1,7 @@
-package com.example.stock.model;
+package com.example.stock.mvc.model;
 
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
-import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.annotation.db.TableName;
 
 
@@ -15,8 +14,7 @@ public class Article {
 
     String libelle;
 
-    @TableColumnName(value="sigle_gestion_stock")
-    @ManytoOne(joinColumn = "sigle", toDisplayOnCombobox = "toDisplayOnCombobox")
+    @ManytoOne(joinColumn = "sigle_gestion_stock", toDisplayOnCombobox = "toDisplayOnCombobox")
     MethodeGestionStock MethodGestionStock;
 
     public Integer getId() {

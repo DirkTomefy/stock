@@ -28,7 +28,18 @@ public class GenericFormPanel extends JPanel {
 
     private Object object;
     private HashMap<String, DFWInput> inputs;
+    private JButton validateButton;
     private MouseListener validateFormListener;
+
+    public MouseListener getValidateFormListener() {
+        return validateFormListener;
+    }
+
+    public void setValidateFormListener(MouseListener validateFormListener) {
+        this.validateFormListener = validateFormListener;
+        this.validateButton.removeMouseListener(this.validateFormListener);
+        this.validateButton.addMouseListener(validateFormListener);
+    }
 
     public GenericFormPanel(Object object, MouseListener validateFormListener) {
         setLayout(new BorderLayout(10, 10));
@@ -53,7 +64,8 @@ public class GenericFormPanel extends JPanel {
         }
 
         add(fieldsPanel, BorderLayout.CENTER);
-        add(createButtonPanel(), BorderLayout.SOUTH);
+        this.validateButton = createButton();
+        add(createButtonPanel(this.validateButton), BorderLayout.SOUTH);
     }
 
     private boolean isDisplayable(Field field) {
@@ -105,12 +117,19 @@ public class GenericFormPanel extends JPanel {
         return field.getType() == LocalDateTime.class;
     }
 
-    private JPanel createButtonPanel() {
+    private JPanel createButtonPanel(JButton boutonValider) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBackground(new Color(245, 245, 245));
 
         buttonPanel.add(Box.createHorizontalGlue());
+        
+        buttonPanel.add(boutonValider);
+        buttonPanel.add(Box.createHorizontalStrut(5));
+        return buttonPanel;
+    }
+
+    private JButton createButton() {
         JButton validateButton = new JButton("Valider");
         validateButton.setFont(new Font("Arial", Font.BOLD, 12));
         validateButton.setBackground(new Color(70, 130, 180));
@@ -121,13 +140,47 @@ public class GenericFormPanel extends JPanel {
         if (validateFormListener != null) {
             validateButton.addMouseListener(validateFormListener);
         }
-        buttonPanel.add(validateButton);
-        buttonPanel.add(Box.createHorizontalStrut(5));
-        return buttonPanel;
+        return validateButton;
     }
-
     public HashMap<String, DFWInput> getInputs() {
         return inputs;
     }
 
+    public Object getObject() {
+        return object;
+    }
+
+    public void setObject(Object object) {
+        this.object = object;
+    }
+
+
+    public void fillObject(){
+        try {
+            for (DFWInput input : this.inputs.values()) {
+                FieldInfo fieldInfo = input.getFieldInfo();
+                Object value = input.getValue();
+                fieldInfo.setFieldValue(this.object, value);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resetObject(){
+        try {
+            TableMap tableMap = DirkFwConfig.getClassInfos().get(object.getClass().getName());
+            FieldInfo[] fields = tableMap.getAllFieldWithoutID();
+            for (FieldInfo fieldInfo : fields) {
+                fieldInfo.setFieldValue(this.object, null);
+            }
+            FieldInfo idFieldInfo = DirkFwConfig.getClassInfos().get(object.getClass().getName()).getFieldID();
+            if (idFieldInfo != null) 
+                idFieldInfo.setFieldValue(this.object, null);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
 }

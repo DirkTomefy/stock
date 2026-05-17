@@ -4,16 +4,16 @@ import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.display.classes.DFWFenetre;
 import com.example.stock.dirkfw.start.mapping.TableMap;
-import com.example.stock.view.ArticleFormInsert;
+import com.example.stock.mvc.view.ArticleFormInsertView;
 
 public class StockApplication extends DFWFenetre{
 
 	public static void init() throws Exception {
-		DirkFwConfig.setClassInfos(TableMap.getAllClassFromPackage("com.example.stock.model"));
+		DirkFwConfig.setClassInfos(TableMap.getAllClassFromPackage("com.example.stock.mvc.model"));
 	}
 
 	public void initOnglet(){
-		ArticleFormInsert articleFormInsert = new ArticleFormInsert();
+		ArticleFormInsertView articleFormInsert = new ArticleFormInsertView();
 		addTab("Ajouter un article", articleFormInsert);
 	}
 	public StockApplication(){

@@ -1,12 +1,7 @@
-package com.example.stock.model;
+package com.example.stock.mvc.model;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.TableName;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Setter
-@Getter
 @TableName("methode_gestion_stock")
 public class MethodeGestionStock {
     @IdField
@@ -14,5 +9,13 @@ public class MethodeGestionStock {
 
     public String toDisplayOnCombobox(){
         return sigle;
+    }
+
+    public String getSigle() {
+        return sigle;
+    }
+
+    public void setSigle(String sigle) {
+        this.sigle = sigle;
     }
 }

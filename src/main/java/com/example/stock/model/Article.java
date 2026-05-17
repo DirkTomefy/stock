@@ -16,7 +16,7 @@ public class Article {
     String libelle;
 
     @TableColumnName(value="sigle_gestion_stock")
-    @ManytoOne(joinColumn = "sigle", toDisplayOnCombobox = "sigle")
+    @ManytoOne(joinColumn = "sigle", toDisplayOnCombobox = "toDisplayOnCombobox")
     MethodeGestionStock MethodGestionStock;
 
     public Integer getId() {
@@ -41,6 +41,10 @@ public class Article {
 
     public void setMethodGestionStock(MethodeGestionStock methodGestionStock) {
         MethodGestionStock = methodGestionStock;
+    }
+
+    public String toDisplayOnCombobox() {
+        return libelle;
     }
     
 }

@@ -14,7 +14,7 @@ public class Mouvement {
     Integer id;
 
     @TableColumnName("id_article")
-    @ManytoOne(joinColumn = "id", toDisplayOnCombobox = "libelle")
+    @ManytoOne(joinColumn = "id", toDisplayOnCombobox = "toDisplayOnCombobox")
     Article article;
 
     @TableColumnName("type_mouvement")

@@ -11,4 +11,8 @@ import lombok.Setter;
 public class MethodeGestionStock {
     @IdField
     String sigle;
+
+    public String toDisplayOnCombobox(){
+        return sigle;
+    }
 }

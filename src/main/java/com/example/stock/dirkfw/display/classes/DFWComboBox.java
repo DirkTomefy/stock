@@ -70,7 +70,8 @@ public class DFWComboBox extends JComboBox<Object> implements DFWInput {
             Object result = method.invoke(value);
             return result == null ? "" : result.toString();
         } catch (Exception e) {
-            return value.toString();
+           e.printStackTrace();
+           return "";
         }
     }
 

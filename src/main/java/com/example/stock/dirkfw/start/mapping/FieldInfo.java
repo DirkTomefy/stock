@@ -22,6 +22,8 @@ public class FieldInfo {
     boolean manyToOne;
     Class<?> manyToOneType;
 
+    Method getDisplayChildMethod;
+
     public String getTableColumnName() {
         return tableColumnName;
     }
@@ -159,5 +161,31 @@ public class FieldInfo {
         Class<?> type = field.getType();
         Object value = DBTypes.readValue(result, columnName, type);
         this.setFieldValue(toFill, value);
+    }
+
+    public Method getGetter() {
+        return getter;
+    }
+
+    public Method getSetter() {
+        return setter;
+    }
+
+    public void setManyToOne(boolean manyToOne) {
+        this.manyToOne = manyToOne;
+    }
+
+    public void setManyToOneType(Class<?> manyToOneType) {
+        this.manyToOneType = manyToOneType;
+    }
+
+    
+
+    public Method getGetDisplayChildMethod() {
+        return getDisplayChildMethod;
+    }
+
+    public void setGetDisplayChildMethod(Method getDisplayChildMethod) {
+        this.getDisplayChildMethod = getDisplayChildMethod;
     }
 }

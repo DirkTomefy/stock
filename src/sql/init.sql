@@ -57,6 +57,8 @@ CREATE TABLE mouvement (
 
     cump NUMERIC(15,2),
 
+    source_id INT, -- nullable pour les mouvements d'entrée
+
     CONSTRAINT fk_mouvement_article
         FOREIGN KEY (id_article)
         REFERENCES article(id)

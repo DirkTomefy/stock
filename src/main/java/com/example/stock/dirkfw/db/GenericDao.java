@@ -14,7 +14,7 @@ import com.example.stock.dirkfw.db.query.*;
 import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
 
-public class GenericDao {
+public class GenericDao implements AutoCloseable {
     public DatabaseContext dbctx;
 
     private void executeWithConnection(ConnectionOperation operation) throws Exception {
@@ -299,6 +299,11 @@ public class GenericDao {
                 update(child, conn);
             }
         }
+    }
+
+    @Override
+    public void close() throws Exception {
+        this.dbctx.close();
     }
 
 }

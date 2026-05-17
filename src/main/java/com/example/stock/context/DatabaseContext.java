@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseContext {
+public class DatabaseContext implements AutoCloseable{
 
     private final String URL =
-            "jdbc:postgresql://localhost:5432/test";
+            "jdbc:postgresql://localhost:5432/stock";
 
     private  final String USER =
             "postgres";
@@ -15,7 +15,15 @@ public class DatabaseContext {
     private final String PASSWORD =
             "etu003948";
 
-    public  Connection getConnection() throws SQLException , ClassNotFoundException {
+    public final Connection connection;
+
+    public Connection getConnection() {
+        return connection;
+    }
+    public DatabaseContext() throws SQLException, ClassNotFoundException {
+        this.connection = inttConnection();
+    }
+    public  Connection inttConnection() throws SQLException , ClassNotFoundException {
 
         try {
 
@@ -31,6 +39,12 @@ public class DatabaseContext {
 
             throw e;
           
+        }
+    }
+    @Override
+    public void close() throws Exception {
+        if (connection != null && !connection.isClosed()) {
+            connection.close();
         }
     }
 }

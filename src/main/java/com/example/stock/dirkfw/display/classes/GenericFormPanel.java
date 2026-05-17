@@ -26,11 +26,11 @@ import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class GenericFormPanel extends JPanel {
 
-    private final Object object;
+    private Object object;
     private HashMap<String, DFWInput> inputs;
     private MouseListener validateFormListener;
 
-    public GenericFormPanel(Object object,MouseListener validateFormListener) {
+    public GenericFormPanel(Object object, MouseListener validateFormListener) {
         setLayout(new BorderLayout(10, 10));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setBackground(new Color(245, 245, 245));
@@ -44,20 +44,20 @@ public class GenericFormPanel extends JPanel {
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
         fieldsPanel.setBackground(new Color(245, 245, 245));
 
-        FieldInfo[] fields =  DirkFwConfig.getClassInfos().get(object.getClass().getName()).getAllFieldWithoutID();
+        FieldInfo[] fields = DirkFwConfig.getClassInfos().get(object.getClass().getName()).getAllFieldWithoutID();
 
         for (FieldInfo fieldInfo : fields) {
-            if(isDisplayable(fieldInfo.getReflectField())) {
+            if (isDisplayable(fieldInfo.getReflectField())) {
                 addField(fieldInfo, fieldsPanel);
             }
         }
-        
+
         add(fieldsPanel, BorderLayout.CENTER);
         add(createButtonPanel(), BorderLayout.SOUTH);
     }
 
     private boolean isDisplayable(Field field) {
-        return  !TableMap.isIdField(field) && field.isAnnotationPresent(IgnoreDisplayOpperation.class);
+        return !TableMap.isIdField(field) && !field.isAnnotationPresent(IgnoreDisplayOpperation.class);
     }
 
     private void addField(FieldInfo fieldInfo, JPanel panel) {
@@ -83,17 +83,15 @@ public class GenericFormPanel extends JPanel {
         this.inputs.put(fieldInfo.getTableColumnName(), input);
         fieldPanel.add(label);
         fieldPanel.add(Box.createHorizontalStrut(10));
-        fieldPanel.add((JComponent)input);
-        
+        fieldPanel.add((JComponent) input);
+
         panel.add(fieldPanel);
         panel.add(Box.createVerticalStrut(10));
     }
 
     private DFWInput createManyToOneInput(FieldInfo fieldInfo) {
         Vector<Object> items = new Vector<>();
-
-        try {
-            GenericDao dao = new GenericDao();
+        try (GenericDao dao = new GenericDao()) {
             dao.dbctx = new DatabaseContext();
             items = dao.getAll(fieldInfo.getReflectField().getType());
         } catch (Exception e) {
@@ -102,7 +100,7 @@ public class GenericFormPanel extends JPanel {
 
         return new DFWComboBox(fieldInfo, object, items);
     }
-    
+
     private boolean isDateTimeField(Field field) {
         return field.getType() == LocalDateTime.class;
     }
@@ -119,7 +117,7 @@ public class GenericFormPanel extends JPanel {
         validateButton.setForeground(Color.WHITE);
         validateButton.setFocusPainted(false);
         validateButton.setPreferredSize(new java.awt.Dimension(120, 40));
-        
+
         if (validateFormListener != null) {
             validateButton.addMouseListener(validateFormListener);
         }
@@ -127,9 +125,9 @@ public class GenericFormPanel extends JPanel {
         buttonPanel.add(Box.createHorizontalStrut(5));
         return buttonPanel;
     }
-    
+
     public HashMap<String, DFWInput> getInputs() {
         return inputs;
     }
-    
+
 }

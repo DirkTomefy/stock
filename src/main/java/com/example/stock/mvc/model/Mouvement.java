@@ -29,6 +29,7 @@ public class Mouvement {
 
     Double pu;
 
+    @IgnoreFormulaire
     Double valeur;
 
     @TableColumnName("qte_stock")

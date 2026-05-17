@@ -97,7 +97,7 @@ public class QueryMaker {
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
             Object value;
             try {
-                value = fi.getDatabaseValue(where);
+                value = fi.getDatabaseValue(tableMap,where);
             } catch (Exception e) {
                 throw new ReflectiveOperationException(e);
             }
@@ -142,7 +142,7 @@ public class QueryMaker {
         for (FieldInfo fi : tableMap.getAllFieldWithoutID()) {
             Object value;
             try {
-                value = fi.getDatabaseValue(where);
+                value = fi.getDatabaseValue(tableMap,where);
             } catch (Exception e) {
                 throw new ReflectiveOperationException(e);
             }

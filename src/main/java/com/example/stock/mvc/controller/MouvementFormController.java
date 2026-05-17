@@ -20,7 +20,6 @@ public class MouvementFormController implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         this.view.fillObject();
         Mouvement mouvement = (Mouvement) this.view.getObject();
-        
         // Validation : article requis
         if (mouvement.getArticle() == null) {
             JOptionPane.showMessageDialog(this.view, "Veuillez sélectionner un article", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -48,9 +47,10 @@ public class MouvementFormController implements MouseListener {
         try {
             MouvementService.insertMouvement(mouvement);
             JOptionPane.showMessageDialog(this.view, "Mouvement inséré avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
-        } catch (Exception e1) {
-            JOptionPane.showMessageDialog(this.view, "Erreur : " + e1.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e1) { 
+            JOptionPane.showMessageDialog(this.view, "Erreur : " + e1.getMessage() , "Erreur", JOptionPane.ERROR_MESSAGE);
             e1.printStackTrace();
+            throw new RuntimeException(e1);
         }
         this.view.resetObject();
     }

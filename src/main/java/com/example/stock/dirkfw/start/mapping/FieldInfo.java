@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
+import com.example.stock.dirkfw.annotation.db.RecursiveCall;
 import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.db.util.DBTypes;
 import com.example.stock.dirkfw.err.NoGetterAvailable;
@@ -68,8 +69,17 @@ public class FieldInfo {
         return this.getter.invoke(o);
     }
 
-    public Object getDatabaseValue(Object o) throws ReflectiveOperationException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
+    public Object getDatabaseValue(TableMap tableMap,Object o) throws ReflectiveOperationException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
         Object value = getFieldValue(o);
+        if (isRecursive()) {
+            if (value == null) {
+                return null;
+            }
+
+            TableMap relationMap = getRecursiveTableMap();
+            return relationMap.getIdFieldValue(value);
+        }
+
         if (!isManyToOne()) {
             return value;
         }
@@ -87,6 +97,9 @@ public class FieldInfo {
     }
 
     public static String getTableColumnName(Field field) {
+        if (field.isAnnotationPresent(RecursiveCall.class)) {
+            return field.getAnnotation(RecursiveCall.class).value();
+        }
         if (field.isAnnotationPresent(ManytoOne.class)) {
             return field.getAnnotation(ManytoOne.class).joinColumn();
         }
@@ -97,7 +110,11 @@ public class FieldInfo {
         }
     }
 
-    public Integer getSqlType() throws NonSqlTypeErr, ReflectiveOperationException {
+    public Integer getSqlType(TableMap tableMap) throws NonSqlTypeErr, ReflectiveOperationException {
+        if (isRecursive()) {
+            return DBTypes.getSqlType(getRecursiveTableMap().getFieldID().getReflectField().getType());
+        }
+
         if (isManyToOne()) {
             return DBTypes.getSqlType(getRelatedTableMap().getFieldID().getReflectField().getType());
         }
@@ -121,10 +138,53 @@ public class FieldInfo {
     }
 
     public Class<?> getManyToOneIdType() throws ReflectiveOperationException {
+        if (isRecursive()) {
+            return getRecursiveTableMap().getFieldID().getReflectField().getType();
+        }
+
         if (!isManyToOne()) {
             return this.reflectField.getType();
         }
         return getRelatedTableMap().getFieldID().getReflectField().getType();
+    }
+
+    public boolean isRecursive() {
+        return this.reflectField.isAnnotationPresent(RecursiveCall.class);
+    }
+
+    private TableMap getRecursiveTableMap() throws ReflectiveOperationException {
+        if (!isRecursive()) {
+            throw new IllegalStateException("Le champ n'est pas une relation RecursiveCall");
+        }
+
+        try {
+            TableMap recursiveMap = DirkFwConfig.classInfos == null
+                    ? null
+                    : DirkFwConfig.classInfos.get(this.reflectField.getType().getName());
+
+            if (recursiveMap == null) {
+                recursiveMap = new TableMap(this.reflectField.getType());
+            }
+
+            return recursiveMap;
+        } catch (Exception e) {
+            throw new ReflectiveOperationException(e);
+        }
+    }
+
+    private Object buildRecursiveValue(Object idValue) throws ReflectiveOperationException {
+        if (!isRecursive()) {
+            return idValue;
+        }
+
+        if (idValue == null) {
+            return null;
+        }
+
+        TableMap recursiveMap = getRecursiveTableMap();
+        Object relation = recursiveMap.getConstructor().newInstance();
+        recursiveMap.getFieldID().setFieldValue(relation, idValue);
+        return relation;
     }
 
     private TableMap getRelatedTableMap() throws ReflectiveOperationException {
@@ -151,6 +211,13 @@ public class FieldInfo {
             throws SQLException, ReflectiveOperationException, NonSqlTypeErr, NoSetterAvailable {
         Field field = this.getReflectField();
         String columnName = this.getTableColumnName();
+        if (isRecursive()) {
+            Class<?> idType = getManyToOneIdType();
+            Object idValue = DBTypes.readValue(result, columnName, idType);
+            this.setFieldValue(toFill, buildRecursiveValue(idValue));
+            return;
+        }
+
         if (isManyToOne()) {
             Class<?> idType = getManyToOneIdType();
             Object idValue = DBTypes.readValue(result, columnName, idType);

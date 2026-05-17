@@ -136,14 +136,14 @@ public class MouvementService {
 
         int reste = sortie.getQuantite();
 
-        try (GenericDao dao = new GenericDao()) {
+        try (GenericDao readDao = new GenericDao(); GenericDao updateDao = new GenericDao(); GenericDao saveDao = new GenericDao()) {
 
-            dao.setAlterName(view);
+            readDao.setAlterName(view);
 
             Mouvement where = new Mouvement();
             where.setArticle(sortie.getArticle());
 
-            Vector<Object> entrees = dao.find(where);
+            Vector<Object> entrees = readDao.find(where);
 
             for (Object obj : entrees) {
 
@@ -151,7 +151,8 @@ public class MouvementService {
 
                 Mouvement entree = (Mouvement) obj;
 
-                double disponible = entree.getQuantite() - entree.getQuantitePrise();
+                int dejaPrise = entree.getQuantitePrise() == null ? 0 : entree.getQuantitePrise();
+                double disponible = entree.getQuantite() - dejaPrise;
 
                 if (disponible <= 0) continue;
 
@@ -161,7 +162,19 @@ public class MouvementService {
 
                 reste -= prise;
 
-                dao.save(m);
+                // Mise à jour du mouvement source : on consomme la quantité prise
+                int nouvellePrise = dejaPrise + prise;
+                entree.setQuantitePrise(nouvellePrise);
+                updateDao.update(entree);
+
+                // Stock restant après cette sortie partielle
+                double qteStockRestante = entree.getQteStock() - nouvellePrise;
+                double moneyValueStockRestante = entree.getMoneyValueStock() - (nouvellePrise * m.getPu());
+
+                m.setQteStock(qteStockRestante);
+                m.setMoneyValueStock(moneyValueStockRestante);
+
+                saveDao.save(m);
             }
         }
     }
@@ -205,6 +218,7 @@ public class MouvementService {
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;
         m.setQuantitePrise(0);
+        m.setValeur(m.getPu()*m.getQuantite());
 
         if (m.getArticle() == null || m.getArticle().getMethodGestionStock() == null
                 || m.getArticle().getMethodGestionStock().getSigle() == null) {

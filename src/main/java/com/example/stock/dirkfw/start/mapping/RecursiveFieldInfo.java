@@ -9,6 +9,8 @@ import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
+import lombok.val;
+
 public class RecursiveFieldInfo extends FieldInfo {
 
     private String recursiveColumnName;
@@ -24,52 +26,23 @@ public class RecursiveFieldInfo extends FieldInfo {
     
     @Override
     public String getTableColumnName() {
-        // Override to use the recursive column name instead of default
         return recursiveColumnName;
     }
     
     @Override
-    public Object getDatabaseValue(Object o) throws ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable    {
-        // For recursive relations, extract the ID from the recursive object
-        Object value = this.getFieldValue(o);
-        
+    public Object getDatabaseValue(TableMap tableMap,Object o) throws ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable    {
+        Object value = this.getFieldValue(o); 
+        System.out.println(""+this.getTableColumnName());       
         if (value == null) {
             return null;
         }
-
-        // Get the TableMap for the recursive type to extract its ID
-        Class<?> recursiveType = this.getReflectField().getType();
-        TableMap recursiveMap = DirkFwConfig.classInfos == null
-                ? null
-                : DirkFwConfig.classInfos.get(recursiveType.getName());
-
-        if (recursiveMap == null) {
-            recursiveMap = new TableMap(recursiveType);
-        }
-
-        // Return the ID value of the recursive object
-        return recursiveMap.getIdFieldValue(value);
+        return tableMap.getIdFieldValue(value);
+       
     }
     
     @Override
-    public Integer getSqlType() throws NonSqlTypeErr, ReflectiveOperationException {
-        // For recursive relations, get the ID field type of the recursive class
-        Class<?> recursiveType = this.getReflectField().getType();
-        
-        try {
-            TableMap recursiveMap = DirkFwConfig.classInfos == null
-                    ? null
-                    : DirkFwConfig.classInfos.get(recursiveType.getName());
-
-            if (recursiveMap == null) {
-                recursiveMap = new TableMap(recursiveType);
-            }
-
-            // Return the SQL type of the recursive class's ID field
-            return DBTypes.getSqlType(recursiveMap.getFieldID().getReflectField().getType());
-        } catch (Exception e) {
-            throw new ReflectiveOperationException(e);
-        }
+    public Integer getSqlType(TableMap tableMap) throws NonSqlTypeErr, ReflectiveOperationException {
+        return tableMap.getFieldID().getSqlType(tableMap);   
     }
 
 }

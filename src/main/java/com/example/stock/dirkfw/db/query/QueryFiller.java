@@ -27,9 +27,9 @@ public class QueryFiller {
             throws SQLException, NonSqlTypeErr, ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable {
         
         return processFields(pstmt, tableMap, o, index, false, (stmt, idx, fi, obj) -> {
-            Object value = fi.getDatabaseValue(obj);
+            Object value = fi.getDatabaseValue(tableMap,obj);
             if (value == null) {
-                stmt.setNull(idx, fi.getSqlType());
+                stmt.setNull(idx, fi.getSqlType(tableMap));
             } else {
                 stmt.setObject(idx, value);
             }
@@ -40,9 +40,9 @@ public class QueryFiller {
     public static int fillpstmtForUpdates(PreparedStatement pstmt, TableMap tableMap, Object o)
             throws SQLException, NonSqlTypeErr, ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable {
         return processFields(pstmt, tableMap, o, 1, false, (stmt, idx, fi, obj) -> {
-            Object value = fi.getDatabaseValue(obj);
+            Object value = fi.getDatabaseValue(tableMap,obj);
             if (value == null) {
-                stmt.setNull(idx, fi.getSqlType());
+                stmt.setNull(idx, fi.getSqlType(tableMap));
             } else {
                 stmt.setObject(idx, value);
             }
@@ -53,7 +53,7 @@ public class QueryFiller {
     public static int fillWhere(PreparedStatement pstmt, TableMap tableMap, Object where)
         throws ReflectiveOperationException, SQLException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
         return processFields(pstmt, tableMap, where, 1, true, (stmt, idx, fi, obj) -> {
-            Object value = fi.getDatabaseValue(obj);
+            Object value = fi.getDatabaseValue(tableMap,obj);
             if (value != null) {
                 stmt.setObject(idx, value);
                 return idx + 1;
@@ -69,7 +69,7 @@ public class QueryFiller {
         int index = 1;
 
         for (FieldInfo fInfo : tableMap.getAllFieldWithoutID()) {
-            Object value = fInfo.getDatabaseValue(where);
+            Object value = fInfo.getDatabaseValue(tableMap,where);
             if (value != null) {
                 pstmt.setObject(index, value);
                 index++;

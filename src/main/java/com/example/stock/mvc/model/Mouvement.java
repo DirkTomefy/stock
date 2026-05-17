@@ -41,6 +41,23 @@ public class Mouvement {
     @IgnoreDbOpperation
     Mouvement source;
 
+    
+    public static Mouvement defaultMouvement() {
+    Mouvement mouvement = new Mouvement();
+
+    mouvement.setId(0);
+    mouvement.setQuantite(0);
+
+    mouvement.setPu(0.0);
+    mouvement.setValeur(0.0);
+    mouvement.setQteStock(0.0);
+    mouvement.setMoneyValueStock(0.0);
+    mouvement.setCump(0.0);
+
+    return mouvement;
+}
+
+  
     public Integer getId() {
         return id;
     }

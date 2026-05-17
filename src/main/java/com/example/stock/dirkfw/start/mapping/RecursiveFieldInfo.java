@@ -3,13 +3,12 @@ package com.example.stock.dirkfw.start.mapping;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import com.example.stock.dirkfw.DirkFwConfig;
-import com.example.stock.dirkfw.db.util.DBTypes;
+
 import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
-import lombok.val;
+
 
 public class RecursiveFieldInfo extends FieldInfo {
 

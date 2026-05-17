@@ -8,13 +8,15 @@ import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.annotation.db.TableName;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.annotation.display.IgnoreFormulaire;
+import com.example.stock.dirkfw.annotation.display.DisplayOnList;
+import com.example.stock.dirkfw.annotation.display.PrimaryOnList;
+import com.example.stock.dirkfw.annotation.display.SkipTableList;
 
 @TableName("mouvement")
 public class Mouvement {
     @IdField
     Integer id;
 
-    @TableColumnName("id_article")
     @ManytoOne(joinColumn = "id_article", toDisplayOnCombobox = "toDisplayOnCombobox")
     Article article;
 
@@ -34,22 +36,32 @@ public class Mouvement {
 
     @TableColumnName("qte_stock")
     @IgnoreFormulaire
+    @SkipTableList
     Double qteStock;
 
     @TableColumnName("money_value_stock")
     @IgnoreFormulaire
+    @SkipTableList
     Double moneyValueStock;
 
     @IgnoreFormulaire
+    @SkipTableList
     Double cump;
 
     @IgnoreDisplayOpperation
     @RecursiveCall("source_id")
+    @DisplayOnList("toDisplayOnList")
     Mouvement source;
 
     @TableColumnName("qte_prise")
     @IgnoreFormulaire
+    @SkipTableList
     Integer quantitePrise;
+
+    @TableColumnName("total_prise_for_entree")
+    @IgnoreFormulaire
+    @PrimaryOnList
+    Integer totalPriseForEntree;
     public Integer getQuantitePrise() {
         return quantitePrise;
     }
@@ -59,12 +71,22 @@ public class Mouvement {
         this.quantitePrise = quantitePrise;
     }
 
+    public Integer getTotalPriseForEntree() {
+        return totalPriseForEntree;
+    }
+
+    public void setTotalPriseForEntree(Integer totalPriseForEntree) {
+        this.totalPriseForEntree = totalPriseForEntree;
+    }
+
 
     public static Mouvement defaultMouvement() {
     Mouvement mouvement = new Mouvement();
 
     mouvement.setId(0);
     mouvement.setQuantite(0);
+    mouvement.setQuantitePrise(0);
+    mouvement.setTotalPriseForEntree(0);
 
     mouvement.setPu(0.0);
     mouvement.setValeur(0.0);
@@ -170,6 +192,10 @@ public class Mouvement {
         return "Mouvement [id=" + id + ", article=" + article + ", typeMouvement=" + typeMouvement + ", dateMouvement="
                 + dateMouvement + ", quantite=" + quantite + ", pu=" + pu + ", valeur=" + valeur + ", qteStock="
                 + qteStock + ", moneyValueStock=" + moneyValueStock + ", cump=" + cump + ", source=" + source
-                + ", quantitePrise=" + quantitePrise + "]";
+                + ", quantitePrise=" + quantitePrise + ", totalPriseForEntree=" + totalPriseForEntree + "]";
+    }
+
+    public String toDisplayOnList() {
+        return "Entry #" + id + " (" + (quantite != null ? quantite : 0) + " qty)";
     }
 }

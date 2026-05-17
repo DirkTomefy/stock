@@ -10,6 +10,7 @@ import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.RecursiveCall;
 import com.example.stock.dirkfw.annotation.db.TableColumnName;
+import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.db.util.DBTypes;
 import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
@@ -134,6 +135,8 @@ public class FieldInfo {
         TableMap relationMap = getRelatedTableMap();
         Object relation = relationMap.getConstructor().newInstance();
         relationMap.getFieldID().setFieldValue(relation, idValue);
+
+        hydrateRelation(relation);
         return relation;
     }
 
@@ -184,7 +187,23 @@ public class FieldInfo {
         TableMap recursiveMap = getRecursiveTableMap();
         Object relation = recursiveMap.getConstructor().newInstance();
         recursiveMap.getFieldID().setFieldValue(relation, idValue);
+
+        hydrateRelation(relation);
         return relation;
+    }
+
+    private void hydrateRelation(Object relation) {
+        if (relation == null) {
+            return;
+        }
+
+        try (GenericDao dao = new GenericDao()) {
+            if (dao.dbctx != null) {
+                dao.findById(relation);
+            }
+        } catch (Exception e) {
+            // Si le chargement complet échoue, on conserve au moins l'objet avec son ID.
+        }
     }
 
     private TableMap getRelatedTableMap() throws ReflectiveOperationException {

@@ -42,6 +42,9 @@ public class MouvementService {
         m.setQteStock(last.getQteStock() + m.getQuantite());
 
         m.setMoneyValueStock(last.getMoneyValueStock() + m.getValeur());
+        
+        m.setQuantitePrise(0);
+        m.setTotalPriseForEntree(0);
 
         m.setSource(null);
     }
@@ -151,7 +154,7 @@ public class MouvementService {
 
                 Mouvement entree = (Mouvement) obj;
 
-                int dejaPrise = entree.getQuantitePrise() == null ? 0 : entree.getQuantitePrise();
+                int dejaPrise = entree.getTotalPriseForEntree() == null ? 0 : entree.getTotalPriseForEntree();
                 double disponible = entree.getQuantite() - dejaPrise;
 
                 if (disponible <= 0) continue;
@@ -164,7 +167,7 @@ public class MouvementService {
 
                 // Mise à jour du mouvement source : on consomme la quantité prise
                 int nouvellePrise = dejaPrise + prise;
-                entree.setQuantitePrise(nouvellePrise);
+                entree.setTotalPriseForEntree(nouvellePrise);
                 updateDao.update(entree);
 
                 // Stock restant après cette sortie partielle
@@ -218,6 +221,7 @@ public class MouvementService {
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;
         m.setQuantitePrise(0);
+        m.setTotalPriseForEntree(0);
         m.setValeur(m.getPu()*m.getQuantite());
 
         if (m.getArticle() == null || m.getArticle().getMethodGestionStock() == null

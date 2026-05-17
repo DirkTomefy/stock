@@ -198,7 +198,7 @@ public class GenericDao implements AutoCloseable {
             if (childMap == null) {
                 continue;
             }
-
+            
             String foreignKeyColumn = FieldInfo.getTableColumnName(info.getMappedByField());
 
             Object parentId = parentMap.getIdFieldValue(parent);
@@ -221,7 +221,6 @@ public class GenericDao implements AutoCloseable {
                     }
                 }
             }
-
             info.getSetter().invoke(parent, children);
         }
     }

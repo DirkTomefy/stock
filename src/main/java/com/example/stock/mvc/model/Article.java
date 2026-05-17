@@ -3,6 +3,7 @@ package com.example.stock.mvc.model;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.TableName;
+import com.example.stock.dirkfw.annotation.display.DisplayOnList;
 
 
 
@@ -19,6 +20,7 @@ public class Article {
 
     String libelle;
 
+    @DisplayOnList(value  = "toDisplayOnCombobox")
     @ManytoOne(joinColumn = "sigle_gestion_stock", toDisplayOnCombobox = "toDisplayOnCombobox")
     MethodeGestionStock MethodGestionStock;
 

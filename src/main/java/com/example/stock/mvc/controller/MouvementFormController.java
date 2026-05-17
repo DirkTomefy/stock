@@ -20,25 +20,25 @@ public class MouvementFormController implements MouseListener {
     public void mouseClicked(MouseEvent e) {
         this.view.fillObject();
         Mouvement mouvement = (Mouvement) this.view.getObject();
-        // Validation : article requis
+       
         if (mouvement.getArticle() == null) {
             JOptionPane.showMessageDialog(this.view, "Veuillez sélectionner un article", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Validation : type de mouvement requis
+        
         if (mouvement.getTypeMouvement() == null || mouvement.getTypeMouvement().isEmpty()) {
             JOptionPane.showMessageDialog(this.view, "Veuillez sélectionner un type de mouvement", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Validation : quantité requise et positive
+        
         if (mouvement.getQuantite() == null || mouvement.getQuantite() <= 0) {
             JOptionPane.showMessageDialog(this.view, "Veuillez entrer une quantité positive", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
-        // Validation : prix unitaire requis et positif
+      
         if (mouvement.getPu() == null || mouvement.getPu() <= 0) {
             JOptionPane.showMessageDialog(this.view, "Veuillez entrer un prix unitaire positif", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;

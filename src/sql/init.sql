@@ -1,3 +1,5 @@
+CREATE DATABASE stock;
+\c stock;
 -- ============================================
 -- TABLE : methode_gestion_stock
 -- ============================================
@@ -47,6 +49,8 @@ CREATE TABLE mouvement (
     valeur NUMERIC(15,2) ,
 
     qte_prise NUMERIC(15,2) NOT NULL DEFAULT 0,
+
+    total_prise_for_entree NUMERIC(15,2) NOT NULL DEFAULT 0,
 
     qte_stock NUMERIC(15,2),
 

@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseListener;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import javax.swing.JPanel;
 import com.example.stock.context.DatabaseContext;
 import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
+import com.example.stock.dirkfw.annotation.display.IgnoreFormulaire;
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
@@ -69,7 +71,9 @@ public class GenericFormPanel extends JPanel {
     }
 
     private boolean isDisplayable(Field field) {
-        return !TableMap.isIdField(field) && !field.isAnnotationPresent(IgnoreDisplayOpperation.class);
+        return !TableMap.isIdField(field)
+                && !field.isAnnotationPresent(IgnoreDisplayOpperation.class)
+                && !field.isAnnotationPresent(IgnoreFormulaire.class);
     }
 
     private void addField(FieldInfo fieldInfo, JPanel panel) {
@@ -123,10 +127,45 @@ public class GenericFormPanel extends JPanel {
         buttonPanel.setBackground(new Color(245, 245, 245));
 
         buttonPanel.add(Box.createHorizontalGlue());
-        
+        // reload comboboxes button
+        JButton reload = new JButton("Recharger");
+        reload.setFont(new Font("Arial", Font.BOLD, 12));
+        reload.setBackground(new Color(100, 149, 237));
+        reload.setForeground(Color.WHITE);
+        reload.setFocusPainted(false);
+        reload.setPreferredSize(new java.awt.Dimension(120, 40));
+        reload.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                reloadComboboxes();
+            }
+        });
+
+        buttonPanel.add(reload);
+        buttonPanel.add(Box.createHorizontalStrut(5));
         buttonPanel.add(boutonValider);
         buttonPanel.add(Box.createHorizontalStrut(5));
         return buttonPanel;
+    }
+
+    private void reloadComboboxes() {
+        for (DFWInput input : this.inputs.values()) {
+            if (input instanceof DFWComboBox) {
+                DFWComboBox combo = (DFWComboBox) input;
+                FieldInfo fi = combo.getFieldInfo();
+                Vector<Object> items = new Vector<>();
+                try (GenericDao dao = new GenericDao()) {
+                    dao.dbctx = new DatabaseContext();
+                    items = dao.getAll(fi.getReflectField().getType());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                combo.removeAllItems();
+                for (Object it : items) {
+                    combo.addItem(it);
+                }
+            }
+        }
     }
 
     private JButton createButton() {
@@ -160,8 +199,18 @@ public class GenericFormPanel extends JPanel {
             for (DFWInput input : this.inputs.values()) {
                 FieldInfo fieldInfo = input.getFieldInfo();
                 Object value = input.getValue();
+                // debug: afficher le champ et la valeur récupérée
+                try {
+                    String col = fieldInfo.getTableColumnName();
+                    String valStr = (value == null) ? "null" : value.toString();
+                    System.out.println("[fillObject] field=" + col + " value=" + valStr + " (class=" + (value==null?"null":value.getClass().getName()) + ")");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
                 fieldInfo.setFieldValue(this.object, value);
             }
+            System.out.println(""+object);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -26,11 +26,6 @@ CREATE TABLE article (
         REFERENCES methode_gestion_stock(sigle)
 );
 
--- ============================================
--- TYPE ENUM POUR LE MOUVEMENT
--- ============================================
-
-CREATE TYPE type_mouvement AS ENUM ('ENTREE', 'SORTIE');
 
 -- ============================================
 -- TABLE : mouvement
@@ -41,7 +36,7 @@ CREATE TABLE mouvement (
 
     id_article INT NOT NULL,
 
-    type type_mouvement NOT NULL,
+    type VARCHAR(200) NOT NULL,
 
     date_mouvement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -49,7 +44,9 @@ CREATE TABLE mouvement (
 
     pu NUMERIC(15,2) NOT NULL,
 
-    valeur NUMERIC(15,2) GENERATED ALWAYS AS (qte * pu) STORED,
+    valeur NUMERIC(15,2) ,
+
+    qte_prise NUMERIC(15,2) NOT NULL DEFAULT 0,
 
     qte_stock NUMERIC(15,2),
 
@@ -61,5 +58,28 @@ CREATE TABLE mouvement (
 
     CONSTRAINT fk_mouvement_article
         FOREIGN KEY (id_article)
-        REFERENCES article(id)
+        REFERENCES article(id),
+
+    CONSTRAINT fk_mouvement_source
+        FOREIGN KEY (source_id)
+        REFERENCES mouvement(id)
 );
+
+CREATE OR REPLACE VIEW last_mouvement AS
+SELECT m.*
+FROM mouvement m
+WHERE m.id = (
+    SELECT MAX(id)
+    FROM mouvement
+);
+
+
+CREATE OR REPLACE VIEW mouvement_fifo AS
+SELECT *
+FROM mouvement
+ORDER BY date_mouvement ASC, id ASC;
+
+CREATE OR REPLACE VIEW mouvement_lifo AS
+SELECT *
+FROM mouvement
+ORDER BY date_mouvement DESC, id DESC;

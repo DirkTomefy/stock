@@ -23,3 +23,5 @@ INSERT INTO products (name, price, stock_quantity, category_id) VALUES
 ('Jus d''orange', 1.95, 48, 1),
 ('Chips nature', 1.50, 75, 2),
 ('Barre chocolatée', 1.20, 64, 2);
+
+

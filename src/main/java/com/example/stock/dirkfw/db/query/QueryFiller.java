@@ -5,12 +5,14 @@ import java.util.HashMap;
 
 import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.dirkfw.db.util.FieldProcessor;
+import com.example.stock.dirkfw.err.NoGetterAvailable;
+import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 import com.example.stock.dirkfw.start.mapping.*;
 public class QueryFiller {
 
     private static int processFields(PreparedStatement pstmt, TableMap tableMap, Object o, int index, boolean includeId, FieldProcessor processor)
-            throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
+            throws SQLException, NonSqlTypeErr, ReflectiveOperationException,NoGetterAvailable,NoSetterAvailable {
         for (FieldInfo fInfo : tableMap.getAllFieldWithoutID()) {
             index = processor.process(pstmt, index, fInfo, o);
         }
@@ -22,7 +24,7 @@ public class QueryFiller {
     }
 
     public static int fillpstmtForInsert(PreparedStatement pstmt, TableMap tableMap, Object o, int index)
-            throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
+            throws SQLException, NonSqlTypeErr, ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable {
         
         return processFields(pstmt, tableMap, o, index, false, (stmt, idx, fi, obj) -> {
             Object value = fi.getDatabaseValue(obj);
@@ -36,7 +38,7 @@ public class QueryFiller {
     }
 
     public static int fillpstmtForUpdates(PreparedStatement pstmt, TableMap tableMap, Object o)
-            throws SQLException, NonSqlTypeErr, ReflectiveOperationException {
+            throws SQLException, NonSqlTypeErr, ReflectiveOperationException, NoGetterAvailable, NoSetterAvailable {
         return processFields(pstmt, tableMap, o, 1, false, (stmt, idx, fi, obj) -> {
             Object value = fi.getDatabaseValue(obj);
             if (value == null) {
@@ -49,7 +51,7 @@ public class QueryFiller {
     }
 
     public static int fillWhere(PreparedStatement pstmt, TableMap tableMap, Object where)
-        throws ReflectiveOperationException, SQLException, NonSqlTypeErr {
+        throws ReflectiveOperationException, SQLException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
         return processFields(pstmt, tableMap, where, 1, true, (stmt, idx, fi, obj) -> {
             Object value = fi.getDatabaseValue(obj);
             if (value != null) {
@@ -62,7 +64,7 @@ public class QueryFiller {
 
     public static int fillWhereWithOperations(PreparedStatement pstmt, TableMap tableMap, Object where,
             HashMap<String, ComparaisonOperation> operations)
-        throws ReflectiveOperationException, SQLException, NonSqlTypeErr {
+        throws ReflectiveOperationException, SQLException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
         
         int index = 1;
 

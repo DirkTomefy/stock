@@ -15,36 +15,35 @@ public class DatabaseContext implements AutoCloseable{
     private final String PASSWORD =
             "etu003948";
 
-    public final Connection connection;
-
-    public Connection getConnection() {
-        return connection;
-    }
     public DatabaseContext() throws SQLException, ClassNotFoundException {
-        this.connection = inttConnection();
+        initConnection();
     }
-    public  Connection inttConnection() throws SQLException , ClassNotFoundException {
-
+    
+    public Connection getConnection() throws SQLException, ClassNotFoundException {
+        return createNewConnection();
+    }
+    
+    private void initConnection() throws SQLException, ClassNotFoundException {
+        try (Connection test = createNewConnection()) {
+            // Just test that driver is available and DB is reachable
+        }
+    }
+    
+    private Connection createNewConnection() throws SQLException, ClassNotFoundException {
         try {
-
             Class.forName("org.postgresql.Driver");
-
             return DriverManager.getConnection(
                     URL,
                     USER,
                     PASSWORD
             );
-
         } catch (ClassNotFoundException | SQLException e) {
-
             throw e;
-          
         }
     }
+    
     @Override
     public void close() throws Exception {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
-        }
+        // No-op since each connection is closed in try-with-resources
     }
 }

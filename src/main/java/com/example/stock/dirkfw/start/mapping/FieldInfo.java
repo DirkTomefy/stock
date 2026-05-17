@@ -10,6 +10,7 @@ import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.db.util.DBTypes;
+import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
@@ -22,7 +23,6 @@ public class FieldInfo {
     boolean manyToOne;
     Class<?> manyToOneType;
 
-    Method getDisplayChildMethod;
 
     public String getTableColumnName() {
         return tableColumnName;
@@ -68,7 +68,7 @@ public class FieldInfo {
         return this.getter.invoke(o);
     }
 
-    public Object getDatabaseValue(Object o) throws ReflectiveOperationException, NonSqlTypeErr {
+    public Object getDatabaseValue(Object o) throws ReflectiveOperationException, NonSqlTypeErr, NoGetterAvailable, NoSetterAvailable {
         Object value = getFieldValue(o);
         if (!isManyToOne()) {
             return value;
@@ -179,13 +179,4 @@ public class FieldInfo {
         this.manyToOneType = manyToOneType;
     }
 
-    
-
-    public Method getGetDisplayChildMethod() {
-        return getDisplayChildMethod;
-    }
-
-    public void setGetDisplayChildMethod(Method getDisplayChildMethod) {
-        this.getDisplayChildMethod = getDisplayChildMethod;
-    }
 }

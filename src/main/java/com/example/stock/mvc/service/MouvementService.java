@@ -3,64 +3,243 @@ package com.example.stock.mvc.service;
 import java.util.Vector;
 
 import com.example.stock.dirkfw.db.GenericDao;
+import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.Mouvement;
 
 public class MouvementService {
-    public static Mouvement getLastMouvementInfo() throws Exception {
+
+    // =========================================================
+    // LAST MOUVEMENT
+    // =========================================================
+    public static Mouvement getLastMouvementInfo(Article article) throws Exception {
+
         try (GenericDao dao = new GenericDao()) {
+
             dao.setAlterName("last_mouvement");
 
-            Vector<Object> lastMouvements = dao.find(new Mouvement());
+            Mouvement where = new Mouvement();
+            where.setArticle(article);
 
-            if (lastMouvements.isEmpty()) {
+            Vector<Object> res = dao.find(where);
+
+            if (res.isEmpty()) {
                 return Mouvement.defaultMouvement();
             }
 
-            return (Mouvement) lastMouvements.get(0);
-
-        } catch (Exception e) {
-            throw e;
+            return (Mouvement) res.get(0);
         }
     }
 
+    // =========================================================
+    // ENTRY COMMON LOGIC (FIFO / LIFO IDENTICAL)
+    // =========================================================
+    private static void processEntree(Mouvement m, Mouvement last) {
+
+        m.setTypeMouvement("ENTREE");
+
+        m.setValeur(calcValeur(m));
+
+        m.setQteStock(last.getQteStock() + m.getQuantite());
+
+        m.setMoneyValueStock(last.getMoneyValueStock() + m.getValeur());
+
+        m.setSource(null);
+    }
+
+    // =========================================================
+    // CUMP
+    // =========================================================
     public static void insertMouvementAsCUMP(Object mouvement) throws Exception {
 
-        if (mouvement instanceof Mouvement) {
+        if (!(mouvement instanceof Mouvement)) return;
+        Mouvement m = (Mouvement) mouvement;
 
-            Mouvement m = (Mouvement) mouvement;
+        Mouvement last = getLastMouvementInfo(m.getArticle());
 
-            // ! initialisation de la valeur du mouvement
-            m.setValeur(m.getPu() * m.getQuantite());
+        m.setValeur(calcValeur(m));
 
-            Mouvement lastMouvement = getLastMouvementInfo();
+        if (m.getTypeMouvement().equals("ENTREE")) {
 
-            if (m.getTypeMouvement().equals("ENTREE")) {
+            m.setQteStock(last.getQteStock() + m.getQuantite());
+            m.setMoneyValueStock(last.getMoneyValueStock() + m.getValeur());
 
-                m.setQteStock(
-                        lastMouvement.getQteStock() + m.getQuantite());
+        } else {
 
-                m.setMoneyValueStock(
-                        lastMouvement.getMoneyValueStock() + m.getValeur());
+            m.setQteStock(last.getQteStock() - m.getQuantite());
+            m.setMoneyValueStock(last.getMoneyValueStock() - m.getValeur());
+        }
 
-            } else if (m.getTypeMouvement().equals("SORTIE")) {
-
-                m.setQteStock(
-                        lastMouvement.getQteStock() - m.getQuantite());
-
-                m.setMoneyValueStock(
-                        lastMouvement.getMoneyValueStock() - m.getValeur());
-            }
-
-            m.setCump(
-                    m.getMoneyValueStock() / m.getQteStock());
+        m.setCump(m.getMoneyValueStock() / m.getQteStock());
+        
+        try (GenericDao dao = new GenericDao()) {
+            dao.save(m);
         }
     }
 
-    public static void insertMouvmentAsLIFO(Object mouvement) {
+    // =========================================================
+    // FIFO ENTREE
+    // =========================================================
+    public static void insertMouvmentAsFIFOENTREE(Object mouvement) throws Exception {
 
+        if (!(mouvement instanceof Mouvement)) return;
+        Mouvement m = (Mouvement) mouvement;
+
+        Mouvement last = getLastMouvementInfo(m.getArticle());
+
+        processEntree(m, last);
+        
+        try (GenericDao dao = new GenericDao()) {
+            dao.save(m);
+        }
     }
 
-    public static void insertMouvmentAsFIFO(Object mouvement) {
+    // =========================================================
+    // LIFO ENTREE
+    // =========================================================
+    public static void insertMouvmentAsLIFOENTREE(Object mouvement) throws Exception {
 
+        if (!(mouvement instanceof Mouvement)) return;
+        Mouvement m = (Mouvement) mouvement;
+
+        Mouvement last = getLastMouvementInfo(m.getArticle());
+
+        processEntree(m, last);
+        
+        try (GenericDao dao = new GenericDao()) {
+            dao.save(m);
+        }
+    }
+
+    // =========================================================
+    // FIFO SORTIE
+    // =========================================================
+    public static void insertMouvmentAsFIFOSORTIE(Object mouvement) throws Exception {
+
+        processSortie(mouvement, "mouvement_fifo");
+    }
+
+    // =========================================================
+    // LIFO SORTIE
+    // =========================================================
+    public static void insertMouvmentAsLIFOSORTIE(Object mouvement) throws Exception {
+
+        processSortie(mouvement, "mouvement_lifo");
+    }
+
+    // =========================================================
+    // SORTIE COMMON LOGIC
+    // =========================================================
+    private static void processSortie(Object mouvement, String view) throws Exception {
+
+        if (!(mouvement instanceof Mouvement)) return;
+        Mouvement sortie = (Mouvement) mouvement;
+
+        int reste = sortie.getQuantite();
+
+        try (GenericDao dao = new GenericDao()) {
+
+            dao.setAlterName(view);
+
+            Mouvement where = new Mouvement();
+            where.setArticle(sortie.getArticle());
+
+            Vector<Object> entrees = dao.find(where);
+
+            for (Object obj : entrees) {
+
+                if (reste <= 0) break;
+
+                Mouvement entree = (Mouvement) obj;
+
+                double disponible = entree.getQuantite() - entree.getQuantitePrise();
+
+                if (disponible <= 0) continue;
+
+                int prise = (int) Math.min(reste, disponible);
+
+                Mouvement m = buildSortie(sortie, entree, prise);
+
+                reste -= prise;
+
+                dao.save(m);
+            }
+        }
+    }
+
+    // =========================================================
+    // BUILD SORTIE OBJECT
+    // =========================================================
+    private static Mouvement buildSortie(Mouvement sortie, Mouvement entree, int prise) {
+
+        Mouvement m = new Mouvement();
+
+        m.setArticle(sortie.getArticle());
+        m.setTypeMouvement("SORTIE");
+        m.setDateMouvement(sortie.getDateMouvement());
+
+        m.setSource(entree);
+        m.setQuantitePrise(prise);
+
+        m.setPu(entree.getPu());
+        m.setQuantite(prise);
+
+        m.setValeur(calcValeur(m));
+
+        return m;
+    }
+
+    // =========================================================
+    // VALUE CALCULATION
+    // =========================================================
+    private static double calcValeur(Mouvement m) {
+        return m.getPu() * m.getQuantite();
+    }
+
+    // =========================================================
+    // PUBLIC ROUTER: INSERT MOUVEMENT
+    // Choisit la stratégie (CUMP / FIFO / LIFO) puis appelle
+    // la fonction d'insertion adaptée selon le type (ENTREE/SORTIE)
+    // =========================================================
+    public static void insertMouvement(Object mouvement) throws Exception {
+
+        if (!(mouvement instanceof Mouvement)) return;
+        Mouvement m = (Mouvement) mouvement;
+        m.setQuantitePrise(0);
+
+        if (m.getArticle() == null || m.getArticle().getMethodGestionStock() == null
+                || m.getArticle().getMethodGestionStock().getSigle() == null) {
+            // Par défaut on tombe sur CUMP
+            insertMouvementAsCUMP(m);
+            return;
+        }
+
+        String sigle = m.getArticle().getMethodGestionStock().getSigle();
+
+        switch (sigle) {
+        case "CUMP":
+            insertMouvementAsCUMP(m);
+            break;
+
+        case "FIFO":
+            if ("ENTREE".equalsIgnoreCase(m.getTypeMouvement())) {
+                insertMouvmentAsFIFOENTREE(m);
+            } else {
+                insertMouvmentAsFIFOSORTIE(m);
+            }
+            break;
+
+        case "LIFO":
+            if ("ENTREE".equalsIgnoreCase(m.getTypeMouvement())) {
+                insertMouvmentAsLIFOENTREE(m);
+            } else {
+                insertMouvmentAsLIFOSORTIE(m);
+            }
+            break;
+
+        default:
+            // fallback
+            insertMouvementAsCUMP(m);
+            break;
+        }
     }
 }

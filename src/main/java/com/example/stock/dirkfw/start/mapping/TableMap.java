@@ -78,7 +78,7 @@ public class TableMap {
     // CONSTRUCTOR
     // =========================
 
-    public TableMap(Class<?> clazz) throws Exception {
+    public TableMap(Class<?> clazz) throws ReflectiveOperationException,NoGetterAvailable, NoSetterAvailable {
         initializeTable(clazz);
         initializeFields(clazz);
         initializeOneToManyFields(clazz);
@@ -116,7 +116,7 @@ public class TableMap {
         this.setAllFieldWithoutID(fieldInfos.toArray(new FieldInfo[0]));
     }
 
-    private void initializeOneToManyFields(Class<?> clazz) throws Exception {
+    private void initializeOneToManyFields(Class<?> clazz) throws ReflectiveOperationException,NoGetterAvailable, NoSetterAvailable {
         List<OneToManyInfo> oneToManyList = new ArrayList<>();
 
         for (Field field : clazz.getDeclaredFields()) {
@@ -172,11 +172,18 @@ public class TableMap {
 
     private FieldInfo createFieldInfo(Class<?> clazz, Field field)
             throws NoGetterAvailable, NoSetterAvailable {
+        java.lang.reflect.Method getter = getterField(clazz, field);
+        java.lang.reflect.Method setter = setterField(clazz, field);
+
+        if (field.isAnnotationPresent(com.example.stock.dirkfw.annotation.db.RecursiveCall.class)) {
+            String col = field.getAnnotation(com.example.stock.dirkfw.annotation.db.RecursiveCall.class).value();
+            return new com.example.stock.dirkfw.start.mapping.RecursiveFieldInfo(field, getter, setter, col);
+        }
 
         return new FieldInfo(
-                field,
-                getterField(clazz, field),
-                setterField(clazz, field));
+            field,
+            getter,
+            setter);
     }
 
     private String getTableNameFromAnnotation(Class<?> clazz) {

@@ -5,6 +5,7 @@ import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.display.classes.DFWFenetre;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 import com.example.stock.mvc.view.ArticleFormInsertView;
+import com.example.stock.mvc.view.MouvementFormInsertView;
 
 public class StockApplication extends DFWFenetre{
 
@@ -15,6 +16,8 @@ public class StockApplication extends DFWFenetre{
 	public void initOnglet(){
 		ArticleFormInsertView articleFormInsert = new ArticleFormInsertView();
 		addTab("Ajouter un article", articleFormInsert);
+		MouvementFormInsertView mouvementFormInsert = new MouvementFormInsertView();
+		addTab("Ajouter un mouvement", mouvementFormInsert);
 	}
 	public StockApplication(){
 		super();
@@ -25,10 +28,9 @@ public class StockApplication extends DFWFenetre{
 	}
 	public static void main(String[] args) throws Exception {
 		init();
+		GenericDao.initializeContext(new DatabaseContext());
 		StockApplication app = new StockApplication();
 		app.setVisible(true);
-		GenericDao dao = new GenericDao();
-		dao.dbctx = new DatabaseContext();
 	}
 
 }

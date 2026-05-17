@@ -9,6 +9,11 @@ import com.example.stock.dirkfw.annotation.db.TableName;
 
 @TableName("article")
 public class Article {
+    @Override
+    public String toString() {
+        return "Article [id=" + id + ", libelle=" + libelle + "]";
+    }
+
     @IdField
     Integer id;
 

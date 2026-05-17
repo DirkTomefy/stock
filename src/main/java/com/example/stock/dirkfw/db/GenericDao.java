@@ -15,8 +15,17 @@ import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
 
 public class GenericDao implements AutoCloseable {
+    private static DatabaseContext staticDbctx;
     public DatabaseContext dbctx;
     private String alterName;
+
+    public static void initializeContext(DatabaseContext ctx) {
+        GenericDao.staticDbctx = ctx;
+    }
+
+    public GenericDao() {
+        this.dbctx = staticDbctx;
+    }
 
     public String getAlterName() {
         return alterName;

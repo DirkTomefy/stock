@@ -2,11 +2,12 @@ package com.example.stock.mvc.model;
 import java.time.LocalDateTime;
 
 import com.example.stock.dirkfw.annotation.db.IdField;
-import com.example.stock.dirkfw.annotation.db.IgnoreDbOpperation;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
+import com.example.stock.dirkfw.annotation.db.RecursiveCall;
 import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.annotation.db.TableName;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
+import com.example.stock.dirkfw.annotation.display.IgnoreFormulaire;
 
 @TableName("mouvement")
 public class Mouvement {
@@ -14,15 +15,16 @@ public class Mouvement {
     Integer id;
 
     @TableColumnName("id_article")
-    @ManytoOne(joinColumn = "id", toDisplayOnCombobox = "toDisplayOnCombobox")
+    @ManytoOne(joinColumn = "id_article", toDisplayOnCombobox = "toDisplayOnCombobox")
     Article article;
 
-    @TableColumnName("type_mouvement")
+    @TableColumnName("type")
     String typeMouvement; // "ENTREE" ou "SORTIE"
 
+    @TableColumnName("date_mouvement")
     LocalDateTime dateMouvement;
 
-    @TableColumnName("quantite")
+    @TableColumnName("qte")
     Integer quantite;   
 
     Double pu;
@@ -30,18 +32,33 @@ public class Mouvement {
     Double valeur;
 
     @TableColumnName("qte_stock")
+    @IgnoreFormulaire
     Double qteStock;
 
     @TableColumnName("money_value_stock")
+    @IgnoreFormulaire
     Double moneyValueStock;
 
+    @IgnoreFormulaire
     Double cump;
 
     @IgnoreDisplayOpperation
-    @IgnoreDbOpperation
+    @RecursiveCall("source_id")
     Mouvement source;
 
-    
+    @TableColumnName("qte_prise")
+    @IgnoreFormulaire
+    Integer quantitePrise;
+    public Integer getQuantitePrise() {
+        return quantitePrise;
+    }
+
+
+    public void setQuantitePrise(Integer quantitePrise) {
+        this.quantitePrise = quantitePrise;
+    }
+
+
     public static Mouvement defaultMouvement() {
     Mouvement mouvement = new Mouvement();
 
@@ -144,5 +161,14 @@ public class Mouvement {
 
     public void setSource(Mouvement source) {
         this.source = source;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Mouvement [id=" + id + ", article=" + article + ", typeMouvement=" + typeMouvement + ", dateMouvement="
+                + dateMouvement + ", quantite=" + quantite + ", pu=" + pu + ", valeur=" + valeur + ", qteStock="
+                + qteStock + ", moneyValueStock=" + moneyValueStock + ", cump=" + cump + ", source=" + source
+                + ", quantitePrise=" + quantitePrise + "]";
     }
 }

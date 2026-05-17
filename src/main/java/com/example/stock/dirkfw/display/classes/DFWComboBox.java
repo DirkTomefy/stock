@@ -77,6 +77,7 @@ public class DFWComboBox extends JComboBox<Object> implements DFWInput {
 
     @Override
     public Object getValue() {
+         System.out.println(""+getSelectedItem());
         return getSelectedItem();
     }
 
@@ -127,6 +128,7 @@ public class DFWComboBox extends JComboBox<Object> implements DFWInput {
     }
 
     public Object getObject() {
+       
         return object;
     }
 }

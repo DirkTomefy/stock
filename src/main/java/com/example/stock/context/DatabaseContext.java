@@ -6,30 +6,22 @@ import java.sql.SQLException;
 
 public class DatabaseContext implements AutoCloseable{
 
-    private final String URL =
+    private static final String URL =
             "jdbc:postgresql://localhost:5432/stock";
 
-    private  final String USER =
+    private  static final String USER =
             "postgres";
 
-    private final String PASSWORD =
+    private static final String PASSWORD =
             "etu003948";
 
-    public DatabaseContext() throws SQLException, ClassNotFoundException {
-        initConnection();
-    }
+    
     
     public Connection getConnection() throws SQLException, ClassNotFoundException {
         return createNewConnection();
     }
-    
-    private void initConnection() throws SQLException, ClassNotFoundException {
-        try (Connection test = createNewConnection()) {
-            // Just test that driver is available and DB is reachable
-        }
-    }
-    
-    private Connection createNewConnection() throws SQLException, ClassNotFoundException {
+     
+    public static Connection createNewConnection() throws SQLException, ClassNotFoundException {
         try {
             Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(
@@ -44,6 +36,6 @@ public class DatabaseContext implements AutoCloseable{
     
     @Override
     public void close() throws Exception {
-        // No-op since each connection is closed in try-with-resources
+        //TODO :
     }
 }

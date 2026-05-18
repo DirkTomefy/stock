@@ -1,7 +1,7 @@
 package com.example.stock;
 import com.example.stock.dirkfw.DirkFwConfig;
-import com.example.stock.context.DatabaseContext;
-import com.example.stock.dirkfw.db.GenericDao;
+
+import java.sql.SQLException;
 import com.example.stock.dirkfw.display.classes.DFWFenetre;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 import com.example.stock.mvc.view.DetailFormView;
@@ -14,7 +14,7 @@ public class StockApplication extends DFWFenetre{
 		DirkFwConfig.setClassInfos(TableMap.getAllClassFromPackage("com.example.stock.mvc.model"));
 	}
 
-	public void initOnglet(){
+	public void initOnglet() throws ClassNotFoundException, SQLException{
 		ArticleFormInsertView articleFormInsert = new ArticleFormInsertView();
 		addTab("Ajouter un article", articleFormInsert);
 		MouvementFormInsertView mouvementFormInsert = new MouvementFormInsertView();
@@ -22,7 +22,7 @@ public class StockApplication extends DFWFenetre{
 		DetailFormView detailFormView = new DetailFormView();
 		addTab("Détails mouvements", detailFormView);
 	}
-	public StockApplication(){
+	public StockApplication() throws ClassNotFoundException, SQLException{
 		super();
 		setTitle("Stock Management");
 		setSize(800, 600);
@@ -31,7 +31,6 @@ public class StockApplication extends DFWFenetre{
 	}
 	public static void main(String[] args) throws Exception {
 		init();
-		GenericDao.initializeContext(new DatabaseContext());
 		StockApplication app = new StockApplication();
 		app.setVisible(true);
 	}

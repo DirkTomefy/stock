@@ -1,12 +1,14 @@
 package com.example.stock.mvc.view;
 
+import java.sql.SQLException;
+
 import com.example.stock.dirkfw.display.classes.GenericFormPanel;
 import com.example.stock.mvc.controller.ArticleFormController;
 import com.example.stock.mvc.model.Article;
 
 public class ArticleFormInsertView extends GenericFormPanel {
 
-    public ArticleFormInsertView() {
+    public ArticleFormInsertView() throws ClassNotFoundException, SQLException {
         super(new Article(), null);  
         ArticleFormController controller = new ArticleFormController(this);  
         setValidateFormListener(controller);    

@@ -1,7 +1,6 @@
 package com.example.stock.mvc.service;
 
 import java.util.Vector;
-
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.Mouvement;
@@ -11,7 +10,7 @@ public class MouvementService {
     // =========================================================
     // LAST MOUVEMENT
     // =========================================================
-    public static Mouvement getLastMouvementInfo(Article article) throws Exception {
+    public  static Mouvement getLastMouvementInfo(Article article) throws Exception {
 
         try (GenericDao dao = new GenericDao()) {
 
@@ -116,7 +115,7 @@ public class MouvementService {
     // =========================================================
     // FIFO SORTIE
     // =========================================================
-    public static void insertMouvmentAsFIFOSORTIE(Object mouvement) throws Exception {
+    public static  void insertMouvmentAsFIFOSORTIE(Object mouvement) throws Exception {
 
         processSortie(mouvement, "mouvement_fifo");
     }
@@ -124,7 +123,7 @@ public class MouvementService {
     // =========================================================
     // LIFO SORTIE
     // =========================================================
-    public static void insertMouvmentAsLIFOSORTIE(Object mouvement) throws Exception {
+    public   static void insertMouvmentAsLIFOSORTIE(Object mouvement) throws Exception {
 
         processSortie(mouvement, "mouvement_lifo");
     }
@@ -185,7 +184,7 @@ public class MouvementService {
     // =========================================================
     // BUILD SORTIE OBJECT
     // =========================================================
-    private static Mouvement buildSortie(Mouvement sortie, Mouvement entree, int prise) {
+    private  static Mouvement buildSortie(Mouvement sortie, Mouvement entree, int prise) {
 
         Mouvement m = new Mouvement();
 
@@ -216,7 +215,7 @@ public class MouvementService {
     // Choisit la stratégie (CUMP / FIFO / LIFO) puis appelle
     // la fonction d'insertion adaptée selon le type (ENTREE/SORTIE)
     // =========================================================
-    public static void insertMouvement(Object mouvement) throws Exception {
+    public static  void insertMouvement(Object mouvement) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;

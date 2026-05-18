@@ -15,18 +15,7 @@ import com.example.stock.dirkfw.db.util.*;
 import com.example.stock.dirkfw.start.mapping.*;
 
 public class GenericDao implements AutoCloseable {
-    private static DatabaseContext staticDbctx;
-    public DatabaseContext dbctx;
     private String alterName;
-
-    public static void initializeContext(DatabaseContext ctx) {
-        GenericDao.staticDbctx = ctx;
-    }
-
-    public GenericDao() {
-        this.dbctx = staticDbctx;
-    }
-
     public String getAlterName() {
         return alterName;
     }
@@ -40,17 +29,21 @@ public class GenericDao implements AutoCloseable {
     }
 
     private void executeWithConnection(ConnectionOperation operation) throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
-            conn.setAutoCommit(false);
-            operation.execute(conn);
-            conn.commit();
+        try (DatabaseContext databaseContext = new DatabaseContext()) {
+            try (Connection conn = databaseContext.getConnection()) {
+                conn.setAutoCommit(false);
+                operation.execute(conn);
+                conn.commit();
+            }
         }
     }
 
     private <T> T executeQueryWithConnection(ConnectionQuery<T> query) throws Exception {
-        try (Connection conn = dbctx.getConnection()) {
+         try (DatabaseContext databaseContext = new DatabaseContext()) {
+        try (Connection conn = databaseContext.getConnection()) {
             return query.execute(conn);
         }
+    }
     }
 
     public void save(Object o) throws Exception {
@@ -324,7 +317,7 @@ public class GenericDao implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        this.dbctx.close();
+        //ICI
     }
 
 }

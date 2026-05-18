@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.event.MouseListener;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Vector;
@@ -32,7 +34,9 @@ public class GenericFormPanel extends JPanel {
     private HashMap<String, DFWInput> inputs;
     private JButton validateButton;
     private MouseListener validateFormListener;
+    private Connection connection;
 
+    
     public MouseListener getValidateFormListener() {
         return validateFormListener;
     }
@@ -43,15 +47,16 @@ public class GenericFormPanel extends JPanel {
         this.validateButton.addMouseListener(validateFormListener);
     }
 
-    public GenericFormPanel(Object object, MouseListener validateFormListener) {
+    public GenericFormPanel(Object object, MouseListener validateFormListener) throws ClassNotFoundException, SQLException {
         setLayout(new BorderLayout(10, 10));
         setBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15));
         setBackground(new Color(245, 245, 245));
 
+
         this.object = object;
         this.inputs = new HashMap<>();
         this.validateFormListener = validateFormListener;
-
+        this.connection = DatabaseContext.createNewConnection();
         // Panel pour les champs
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
@@ -108,8 +113,7 @@ public class GenericFormPanel extends JPanel {
     private DFWInput createManyToOneInput(FieldInfo fieldInfo) {
         Vector<Object> items = new Vector<>();
         try (GenericDao dao = new GenericDao()) {
-            dao.dbctx = new DatabaseContext();
-            items = dao.getAll(fieldInfo.getReflectField().getType());
+            items = dao.getAll(fieldInfo.getReflectField().getType(),connection);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,8 +159,7 @@ public class GenericFormPanel extends JPanel {
                 FieldInfo fi = combo.getFieldInfo();
                 Vector<Object> items = new Vector<>();
                 try (GenericDao dao = new GenericDao()) {
-                    dao.dbctx = new DatabaseContext();
-                    items = dao.getAll(fi.getReflectField().getType());
+                    items = dao.getAll(fi.getReflectField().getType(),connection);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

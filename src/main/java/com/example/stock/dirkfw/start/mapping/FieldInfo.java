@@ -196,11 +196,8 @@ public class FieldInfo {
         if (relation == null) {
             return;
         }
-
         try (GenericDao dao = new GenericDao()) {
-            if (dao.dbctx != null) {
                 dao.findById(relation);
-            }
         } catch (Exception e) {
             // Si le chargement complet échoue, on conserve au moins l'objet avec son ID.
         }

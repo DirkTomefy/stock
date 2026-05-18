@@ -1,8 +1,6 @@
 package com.example.stock.mvc.service;
-
 import java.util.HashMap;
 import java.util.Vector;
-
 import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.mvc.model.DetailFormInput;

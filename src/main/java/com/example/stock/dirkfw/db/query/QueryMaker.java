@@ -170,6 +170,7 @@ public class QueryMaker {
         }
 
         query.append(whereClause);
+        query.append(" ORDER BY ").append(tableMap.getFieldID().getTableColumnName());
         return query.toString();
     }
 

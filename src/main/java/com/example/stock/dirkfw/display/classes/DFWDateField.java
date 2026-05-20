@@ -41,13 +41,11 @@ public class DFWDateField extends JPanel implements DFWInput {
         this.fieldInfo = fieldInfo;
         this.object = object;
         
-        // Créer le spinner pour la date
         SpinnerDateModel model = new SpinnerDateModel();
         dateSpinner = new JSpinner(model);
         JSpinner.DateEditor editor = new JSpinner.DateEditor(dateSpinner, "yyyy-MM-dd HH:mm");
         dateSpinner.setEditor(editor);
         
-        // Initialiser avec la valeur actuelle si elle existe
         try {
             Object value = fieldInfo.getFieldValue(object);
             if (value instanceof LocalDateTime) {

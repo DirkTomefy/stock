@@ -94,7 +94,7 @@ public class TableMap {
     }
 
     private void initializeFields(Class<?> clazz)
-            throws NoGetterAvailable, NoSetterAvailable {
+            throws NoGetterAvailable, NoSetterAvailable, NoSuchMethodException {
 
         List<FieldInfo> fieldInfos = new ArrayList<>();
 
@@ -171,7 +171,7 @@ public class TableMap {
     }
 
     private FieldInfo createFieldInfo(Class<?> clazz, Field field)
-            throws NoGetterAvailable, NoSetterAvailable {
+            throws NoGetterAvailable, NoSetterAvailable, NoSuchMethodException {
         java.lang.reflect.Method getter = getterField(clazz, field);
         java.lang.reflect.Method setter = setterField(clazz, field);
 

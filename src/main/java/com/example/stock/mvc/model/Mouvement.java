@@ -36,16 +36,13 @@ public class Mouvement {
 
     @TableColumnName("qte_stock")
     @IgnoreFormulaire
-    @SkipTableList
     Double qteStock;
 
     @TableColumnName("money_value_stock")
     @IgnoreFormulaire
-    @SkipTableList
     Double moneyValueStock;
 
     @IgnoreFormulaire
-    @SkipTableList
     Double cump;
 
     @IgnoreDisplayOpperation

@@ -7,9 +7,7 @@ import com.example.stock.mvc.model.Mouvement;
 
 public class MouvementService {
 
-    // =========================================================
-    // LAST MOUVEMENT
-    // =========================================================
+   
     public  static Mouvement getLastMouvementInfo(Article article) throws Exception {
 
         try (GenericDao dao = new GenericDao()) {
@@ -29,10 +27,8 @@ public class MouvementService {
         }
     }
 
-    // =========================================================
-    // ENTRY COMMON LOGIC (FIFO / LIFO IDENTICAL)
-    // =========================================================
-    private static void processEntree(Mouvement m, Mouvement last) {
+    
+    private static void processEntreeForLifoFifo(Mouvement m, Mouvement last) {
 
         m.setTypeMouvement("ENTREE");
 
@@ -48,9 +44,7 @@ public class MouvementService {
         m.setSource(null);
     }
 
-    // =========================================================
-    // CUMP
-    // =========================================================
+    
     public static void insertMouvementAsCUMP(Object mouvement) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
@@ -78,9 +72,7 @@ public class MouvementService {
         }
     }
 
-    // =========================================================
-    // FIFO ENTREE
-    // =========================================================
+    
     public static void insertMouvmentAsFIFOENTREE(Object mouvement) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
@@ -88,7 +80,7 @@ public class MouvementService {
 
         Mouvement last = getLastMouvementInfo(m.getArticle());
 
-        processEntree(m, last);
+        processEntreeForLifoFifo(m, last);
         
         try (GenericDao dao = new GenericDao()) {
             dao.save(m);
@@ -105,7 +97,7 @@ public class MouvementService {
 
         Mouvement last = getLastMouvementInfo(m.getArticle());
 
-        processEntree(m, last);
+        processEntreeForLifoFifo(m, last);
         
         try (GenericDao dao = new GenericDao()) {
             dao.save(m);
@@ -164,12 +156,12 @@ public class MouvementService {
 
                 reste -= prise;
 
-                // Mise à jour du mouvement source : on consomme la quantité prise
+                
                 int nouvellePrise = dejaPrise + prise;
                 entree.setTotalPriseForEntree(nouvellePrise);
                 updateDao.update(entree);
 
-                // Stock restant après cette sortie partielle
+                
                 double qteStockRestante = entree.getQteStock() - nouvellePrise;
                 double moneyValueStockRestante = entree.getMoneyValueStock() - (nouvellePrise * m.getPu());
 
@@ -181,9 +173,7 @@ public class MouvementService {
         }
     }
 
-    // =========================================================
-    // BUILD SORTIE OBJECT
-    // =========================================================
+   
     private  static Mouvement buildSortie(Mouvement sortie, Mouvement entree, int prise) {
 
         Mouvement m = new Mouvement();
@@ -203,18 +193,12 @@ public class MouvementService {
         return m;
     }
 
-    // =========================================================
-    // VALUE CALCULATION
-    // =========================================================
+    
     private static double calcValeur(Mouvement m) {
         return m.getPu() * m.getQuantite();
     }
 
-    // =========================================================
-    // PUBLIC ROUTER: INSERT MOUVEMENT
-    // Choisit la stratégie (CUMP / FIFO / LIFO) puis appelle
-    // la fonction d'insertion adaptée selon le type (ENTREE/SORTIE)
-    // =========================================================
+    
     public static  void insertMouvement(Object mouvement) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
@@ -225,7 +209,6 @@ public class MouvementService {
 
         if (m.getArticle() == null || m.getArticle().getMethodGestionStock() == null
                 || m.getArticle().getMethodGestionStock().getSigle() == null) {
-            // Par défaut on tombe sur CUMP
             insertMouvementAsCUMP(m);
             return;
         }
@@ -254,7 +237,7 @@ public class MouvementService {
             break;
 
         default:
-            // fallback
+            
             insertMouvementAsCUMP(m);
             break;
         }

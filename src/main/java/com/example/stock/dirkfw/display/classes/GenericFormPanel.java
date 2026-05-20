@@ -57,7 +57,6 @@ public class GenericFormPanel extends JPanel {
         this.inputs = new HashMap<>();
         this.validateFormListener = validateFormListener;
         this.connection = DatabaseContext.createNewConnection();
-        // Panel pour les champs
         JPanel fieldsPanel = new JPanel();
         fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
         fieldsPanel.setBackground(new Color(245, 245, 245));
@@ -131,7 +130,6 @@ public class GenericFormPanel extends JPanel {
         buttonPanel.setBackground(new Color(245, 245, 245));
 
         buttonPanel.add(Box.createHorizontalGlue());
-        // reload comboboxes button
         JButton reload = new JButton("Recharger");
         reload.setFont(new Font("Arial", Font.BOLD, 12));
         reload.setBackground(new Color(100, 149, 237));

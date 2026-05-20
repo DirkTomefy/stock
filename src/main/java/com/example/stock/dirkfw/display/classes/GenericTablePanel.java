@@ -12,11 +12,11 @@ import javax.swing.table.TableColumn;
 
 import com.example.stock.dirkfw.DirkFwConfig;
 import com.example.stock.dirkfw.annotation.display.DisplayOnList;
-import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation; // Import ajouté
+import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation; 
 import com.example.stock.dirkfw.annotation.display.PrimaryOnList;
 import com.example.stock.dirkfw.annotation.display.SkipTableList;
+import com.example.stock.dirkfw.start.interfaces.DisplayableOnCombobox;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
-import com.example.stock.dirkfw.start.mapping.RecursiveFieldInfo;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 
 public class GenericTablePanel extends JTable {
@@ -82,7 +82,6 @@ public class GenericTablePanel extends JTable {
         Vector<FieldInfo> fields = new Vector<>();
 
         FieldInfo idField = tableMap.getFieldID();
-        // Vérification de l'annotation IgnoreDisplayOpperation sur l'ID
         if (idField != null 
                 && !idField.getReflectField().isAnnotationPresent(SkipTableList.class)
                 && !idField.getReflectField().isAnnotationPresent(IgnoreDisplayOpperation.class)) {
@@ -110,12 +109,9 @@ public class GenericTablePanel extends JTable {
     }
 
     private void buildTableRows(TableMap tableMap, Vector<FieldInfo> displayFields, Vector<String> columnNames, DefaultTableModel model) {
-        // ajout des en-têtes
         for (String columnName : columnNames) {
             model.addColumn(columnName);
         }
-
-        // repérage des colonnes primaires pour le rendu
         int colIndex = 0;
         for (FieldInfo field : displayFields) {
             if (field.getReflectField().isAnnotationPresent(PrimaryOnList.class)) {
@@ -123,8 +119,6 @@ public class GenericTablePanel extends JTable {
             }
             colIndex++;
         }
-
-        // ajout des lignes de données
         for (Object obj : data) {
             Vector<Object> row = extractRowData(displayFields, obj);
             model.addRow(row);
@@ -136,8 +130,6 @@ public class GenericTablePanel extends JTable {
 
         try {
             for (FieldInfo field : displayFields) {
-                // La vérification est déjà faite au moment de la construction de displayFields,
-                // mais on garde le test par sécurité (l'annotation est ignorée ici).
                 if (field.getReflectField().isAnnotationPresent(IgnoreDisplayOpperation.class)) continue;
 
                 Object value = field.getFieldValue(obj);
@@ -168,9 +160,9 @@ public class GenericTablePanel extends JTable {
             }
         }
 
-        if (field instanceof RecursiveFieldInfo || field.isManyToOne()) {
+        if (field instanceof DisplayableOnCombobox f) {
             try {
-                Method dispMethod = value.getClass().getMethod("toDisplayOnCombobox");
+                Method dispMethod = f.getMethodOnCombobox();
                 Object result = dispMethod.invoke(value);
                 return result == null ? "" : result.toString();
             } catch (Exception ex) {

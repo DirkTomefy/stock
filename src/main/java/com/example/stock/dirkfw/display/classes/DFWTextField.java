@@ -23,7 +23,6 @@ public class DFWTextField extends JTextField implements DFWInput {
         this.fieldInfo = fieldInfo;
         this.object = object;
 
-        // Initialiser le texte avec la valeur actuelle si elle existe
         try {
             Object value = fieldInfo.getFieldValue(object);
             if (value != null) {

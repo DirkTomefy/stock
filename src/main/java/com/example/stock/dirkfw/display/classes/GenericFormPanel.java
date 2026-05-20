@@ -91,7 +91,7 @@ public class GenericFormPanel extends JPanel {
         label.setPreferredSize(new java.awt.Dimension(120, 30));
 
         DFWInput input;
-        if (fieldInfo.isManyToOne()) {
+        if (fieldInfo instanceof com.example.stock.dirkfw.start.mapping.ManyToOneFieldInfo) {
             input = createManyToOneInput(fieldInfo);
         } else if (isDateTimeField(fieldInfo.getReflectField())) {
             input = new DFWDateField(fieldInfo, object);
@@ -112,7 +112,12 @@ public class GenericFormPanel extends JPanel {
     private DFWInput createManyToOneInput(FieldInfo fieldInfo) {
         Vector<Object> items = new Vector<>();
         try (GenericDao dao = new GenericDao()) {
-            items = dao.getAll(fieldInfo.getReflectField().getType(),connection);
+            Class<?> t = fieldInfo.getReflectField().getType();
+            if (fieldInfo instanceof com.example.stock.dirkfw.start.mapping.ManyToOneFieldInfo) {
+                com.example.stock.dirkfw.start.mapping.ManyToOneFieldInfo mto = (com.example.stock.dirkfw.start.mapping.ManyToOneFieldInfo) fieldInfo;
+                t = mto.getManyToOneType();
+            }
+            items = dao.getAll(t, connection);
         } catch (Exception e) {
             e.printStackTrace();
         }

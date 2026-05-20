@@ -19,12 +19,17 @@ public class ArticleFormController implements MouseListener{
     public void mouseClicked(MouseEvent e) {
         this.view.fillObject();
         try {
-        ArticleService.insertArticle(this.view.getObject());
+            ArticleService.insertArticle(this.view.getObject());
+            JOptionPane.showMessageDialog(
+                    this.view,
+                    "Article inséré avec succès",
+                    "Succès",
+                    JOptionPane.INFORMATION_MESSAGE);
+            this.view.resetObject();
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this.view, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
-        this.view.resetObject();
     }
 
     @Override

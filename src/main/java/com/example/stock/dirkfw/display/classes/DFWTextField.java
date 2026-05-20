@@ -4,6 +4,7 @@ import javax.swing.JTextField;
 
 import com.example.stock.dirkfw.display.interfaces.DFWInput;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
+import com.example.stock.dirkfw.start.mapping.ManyToOneFieldInfo;
 
 public class DFWTextField extends JTextField implements DFWInput {
 
@@ -42,9 +43,10 @@ public class DFWTextField extends JTextField implements DFWInput {
         Class<?> fieldType = fieldInfo.getReflectField().getType();
 
         try {
-            if (fieldInfo.isManyToOne()) {
-                Object idValue = parseSimpleValue(text, fieldInfo.getManyToOneIdType());
-                return fieldInfo.buildManyToOneValue(idValue);
+            if (fieldInfo instanceof ManyToOneFieldInfo) {
+                ManyToOneFieldInfo mto = (ManyToOneFieldInfo) fieldInfo;
+                Object idValue = parseSimpleValue(text, mto.getManyToOneIdType());
+                return mto.buildManyToOneValue(idValue);
             }
 
             if (fieldType == String.class) {

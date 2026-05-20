@@ -148,26 +148,33 @@ public class GenericTablePanel extends JTable {
             return "";
         }
 
-        if(field instanceof DisplayableOnList f){
+        if(field instanceof DisplayableOnList ){
             try {
+                DisplayableOnList f = (DisplayableOnList) field;
                 Method dispMethod = f.getMethodOnList();
                 Object result = dispMethod.invoke(value);
+                System.out.println("DisplayAbleOnList");
                 return result == null ? "" : result.toString();
             } catch (Exception ex) {
+                System.out.println("Erreur toDisplay " + field.getTableColumnName() + ""  + ex);
                 return value.toString();
             }
         }
 
-        if (field instanceof DisplayableOnCombobox f) {
+        if (field instanceof DisplayableOnCombobox ) {
             try {
+                DisplayableOnCombobox f = (DisplayableOnCombobox) field;
                 Method dispMethod = f.getMethodOnCombobox();
                 Object result = dispMethod.invoke(value);
+                System.out.println("DisplayAbleOnCombobox");
                 return result == null ? "" : result.toString();
             } catch (Exception ex) {
+                System.out.println("Erreur Combobox");
                 return value.toString();
             }
         }
 
+      
         return value.toString();
     }
 

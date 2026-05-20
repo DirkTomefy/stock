@@ -180,10 +180,30 @@ public class TableMap {
             return new com.example.stock.dirkfw.start.mapping.RecursiveFieldInfo(field, getter, setter, col);
         }
 
-        return new FieldInfo(
-            field,
-            getter,
-            setter);
+        // If the field is annotated OneToMany, build a OneToManyInfo
+        if (field.isAnnotationPresent(OneToMany.class)) {
+            OneToMany annotation = field.getAnnotation(OneToMany.class);
+            Class<?> childClass = getCollectionGenericType(field);
+            if (childClass != null) {
+                try {
+                    Field mappedByField = childClass.getDeclaredField(annotation.mappedBy());
+                    Method childGetter = getterField(childClass, mappedByField);
+                    Method childSetter = setterField(childClass, mappedByField);
+                    Constructor<?> childConstructor = childClass.getConstructor();
+                    return new OneToManyInfo(field, getter, setter, mappedByField, childGetter, childSetter,
+                            childConstructor, annotation.mappedBy(), childClass);
+                } catch (NoSuchFieldException e) {
+                    throw new NoSuchMethodException("MappedBy field not found: " + annotation.mappedBy());
+                }
+            }
+        }
+
+        // If the field is annotated ManytoOne, build a ManyToOneFieldInfo
+        if (field.isAnnotationPresent(com.example.stock.dirkfw.annotation.db.ManytoOne.class)) {
+            return new ManyToOneFieldInfo(field, getter, setter);
+        }
+
+        return new FieldInfo(field, getter, setter);
     }
 
     private String getTableNameFromAnnotation(Class<?> clazz) {
@@ -288,9 +308,10 @@ public class TableMap {
     // =========================
 
     public static boolean isFieldOpperable(Field field) {
+        // A field is opperable when it is not ignored and either not a collection
+        // or explicitly annotated with @OneToMany (we want to handle those)
         return !field.isAnnotationPresent(IgnoreDbOpperation.class)
-                && !field.isAnnotationPresent(OneToMany.class)
-                && !Collection.class.isAssignableFrom(field.getType());
+            && (!Collection.class.isAssignableFrom(field.getType()) || field.isAnnotationPresent(OneToMany.class));
     }
 
     public static boolean isIdField(Field field) {

@@ -4,13 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import com.example.stock.dirkfw.start.interfaces.DisplayableOnCombobox;
-import com.example.stock.dirkfw.start.interfaces.DisplayableOnList;
-
-public class OneToManyInfo implements DisplayableOnCombobox , DisplayableOnList{
-    private Field field;
-    private Method getter;
-    private Method setter;
+public class OneToManyInfo extends FieldInfo{
     private Field mappedByField;
     private Method childGetter;
     private Method childSetter;
@@ -19,36 +13,25 @@ public class OneToManyInfo implements DisplayableOnCombobox , DisplayableOnList{
     private String mappedBy;
     private Class<?> childClass;
 
-    public Method onComboboxMethod;
-    public Method onListMethod;
+ 
 
     public OneToManyInfo(Field field, Method getter, Method setter, Field mappedByField,
             Method childGetter, Method childSetter, Constructor<?> childConstructor,
-            String mappedBy, Class<?> childClass) throws NoSuchMethodException   {
-        this.field = field;
-        this.getter = getter;
-        this.setter = setter;
+            String mappedBy, Class<?> childClass)   {
+        super(field, getter, setter);
         this.mappedByField = mappedByField;
         this.childGetter = childGetter;
         this.childSetter = childSetter;
         this.childConstructor = childConstructor;
-        this.fieldName = field.getName();
+        this.fieldName = getReflectField().getName();
         this.mappedBy = mappedBy;
         this.childClass = childClass;
-        initMethodOnCombobox();
+
     }
 
     // Getters
     public Field getField() {
-        return field;
-    }
-
-    public Method getGetter() {
-        return getter;
-    }
-
-    public Method getSetter() {
-        return setter;
+        return getReflectField();
     }
 
     public Field getMappedByField() {
@@ -79,29 +62,5 @@ public class OneToManyInfo implements DisplayableOnCombobox , DisplayableOnList{
         return childClass;
     }
 
-    @Override
-    public void initMethodOnCombobox() throws NoSuchMethodException   {
-                try {
-                this.onComboboxMethod = this.field.getType().getMethod("toDisplayOnCombobox");
-                } catch (NoSuchMethodException e) {
-                    System.out.println("La méthode dans OneToManyInfo n'existe pas");
-                    throw e;
-                }
-    }
-
-    @Override
-    public Method getMethodOnCombobox() throws Exception {
-        return this.onComboboxMethod;
-    }
-
-    @Override
-    public void initMethodOnList() throws Exception {
-        this.onListMethod=this.field.getType().getMethod("toDisplayOnList");
-               
-    }
-
-    @Override
-    public Method getMethodOnList() throws Exception {
-       return this.onListMethod;
-    }
+    
 }

@@ -92,7 +92,7 @@ public class GenericDao implements AutoCloseable {
         TableMap tableMap = getTableMapInfo(clazz);
 
         String query = QueryMaker.getQueryForSelectWhereWithOperations(tableMap, getQueryTableName(tableMap), e, operations);
-
+            System.out.println(""+query);
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
 
             QueryFiller.fillWhereWithOperations(pstmt, tableMap, e, operations);
@@ -317,7 +317,7 @@ public class GenericDao implements AutoCloseable {
 
     @Override
     public void close() throws Exception {
-        //ICI
+        //? Tsy misy loa hatreto
     }
 
 }

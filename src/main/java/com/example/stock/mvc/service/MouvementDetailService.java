@@ -8,16 +8,7 @@ import com.example.stock.mvc.model.Mouvement;
 
 public class MouvementDetailService {
 
-    public static Vector<Object> findDetails(DetailFormInput input) throws Exception {
-        if (input == null) {
-            throw new IllegalArgumentException("Input cannot be null");
-        }
-        if (input.getArticle() == null) {
-            throw new IllegalArgumentException("Veuillez sélectionner un article");
-        }
-        if (input.getDate() == null) {
-            throw new IllegalArgumentException("Veuillez sélectionner une date");
-        }
+     public static Vector<Object> findDetails(DetailFormInput input) throws Exception {
         try (GenericDao dao = new GenericDao()) {
             HashMap<String, ComparaisonOperation> operations = new HashMap<>();
             operations.put("date_mouvement", ComparaisonOperation.INFEQ);
@@ -25,7 +16,8 @@ public class MouvementDetailService {
             Mouvement where = new Mouvement();
             where.setArticle(input.getArticle());
             where.setDateMouvement(input.getDate());
-
+            
+            System.out.println(""+input.getDate());
             return dao.findAll(where, operations);
         }
     }

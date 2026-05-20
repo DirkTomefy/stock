@@ -2,7 +2,7 @@ package com.example.stock.mvc.service;
 import com.example.stock.dirkfw.db.GenericDao;
 
 public class ArticleService {
-    public static void insertArticle(Object article) {
+    public static void insertArticle(Object article) throws Exception {
         if (article == null)
             throw new IllegalArgumentException("Article cannot be null");
         try (GenericDao dao = new GenericDao()) {
@@ -16,7 +16,7 @@ public class ArticleService {
             }
             dao.save(article);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 

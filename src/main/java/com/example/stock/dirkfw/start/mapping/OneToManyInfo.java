@@ -22,7 +22,7 @@ public class OneToManyInfo implements DisplayableOnCombobox{
 
     public OneToManyInfo(Field field, Method getter, Method setter, Field mappedByField,
             Method childGetter, Method childSetter, Constructor<?> childConstructor,
-            String mappedBy, Class<?> childClass) {
+            String mappedBy, Class<?> childClass) throws NoSuchMethodException   {
         this.field = field;
         this.getter = getter;
         this.setter = setter;
@@ -33,6 +33,7 @@ public class OneToManyInfo implements DisplayableOnCombobox{
         this.fieldName = field.getName();
         this.mappedBy = mappedBy;
         this.childClass = childClass;
+        initMethodOnCombobox();
     }
 
     // Getters
@@ -77,9 +78,13 @@ public class OneToManyInfo implements DisplayableOnCombobox{
     }
 
     @Override
-    public void initMethodOnCombobox() throws Exception {
+    public void initMethodOnCombobox() throws NoSuchMethodException   {
+                try {
                 this.onComboboxMethod = this.field.getType().getMethod("toDisplayOnCombobox");
-
+                } catch (NoSuchMethodException e) {
+                    System.out.println("La méthode dans OneToManyInfo n'existe pas");
+                    throw e;
+                }
     }
 
     @Override

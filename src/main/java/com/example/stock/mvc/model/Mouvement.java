@@ -193,6 +193,9 @@ public class Mouvement {
     }
 
     public String toDisplayOnList() {
-        return "Entry #" + id + " (" + (quantite != null ? quantite : 0) + " qty)";
+        return "Mouvement#"+this.id;
+    }
+    public String toDisplayOnCombobox(){
+        return "Mouvement#"+this.id;
     }
 }

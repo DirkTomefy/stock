@@ -1,6 +1,7 @@
 package com.example.stock.dirkfw.display.util;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class DisplayUtil {
     public static void displayPopUp(JComponent panel,String title){        
@@ -14,5 +15,10 @@ public class DisplayUtil {
 
     }
 
+    public static void displayPopUpErr(JPanel parent,Exception e){
+        JOptionPane.showMessageDialog(parent, "Erreur : " + e.getMessage() , "Erreur", JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
+
+    }
     }
 

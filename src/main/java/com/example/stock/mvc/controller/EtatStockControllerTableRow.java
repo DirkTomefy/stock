@@ -24,7 +24,7 @@ public class EtatStockControllerTableRow implements MouseListener{
             if(e.getClickCount() == 2){
                 EtatStock data = (EtatStock) tablePanel.getData().get(row);
                 try {
-                    DisplayUtil.displayPopUp(new DetailFormView(data), "Tital");
+                    DisplayUtil.displayPopUp(new DetailFormView(data), "Detail des mouvments");
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }

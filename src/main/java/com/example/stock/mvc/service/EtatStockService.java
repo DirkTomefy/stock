@@ -19,6 +19,9 @@ public class EtatStockService {
     }
 
     public static Vector<Object> getEtatStockGeneral(LocalDateTime date) throws Exception {
+        if (date == null) {
+            throw new IllegalArgumentException("Veuillez sélectionner une date");
+        }
         try (GenericDao dao = new GenericDao()) {
 
             Vector<Object> articlesRaw = dao.getAll(Article.class);

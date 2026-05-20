@@ -198,11 +198,25 @@ public class MouvementService {
         return m.getPu() * m.getQuantite();
     }
 
-    
+    public static  void validateFormat(Mouvement m){
+         if (m.getArticle() == null) {
+            throw new IllegalArgumentException("Veuillez sélectionner un article");
+        }
+        if (m.getTypeMouvement() == null || m.getTypeMouvement().isEmpty()) {
+            throw new IllegalArgumentException("Veuillez sélectionner un type de mouvement");
+        }
+        if (m.getQuantite() == null || m.getQuantite() <= 0) {
+            throw new IllegalArgumentException("Veuillez entrer une quantité positive");
+        }
+        if (m.getPu() == null || m.getPu() <= 0) {
+            throw new IllegalArgumentException("Veuillez entrer un prix unitaire positif");
+        }
+    }
     public static  void insertMouvement(Object mouvement) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;
+        validateFormat(m);
         m.setQuantitePrise(0);
         m.setTotalPriseForEntree(0);
         m.setValeur(m.getPu()*m.getQuantite());

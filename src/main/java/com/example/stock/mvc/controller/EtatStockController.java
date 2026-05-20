@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import javax.swing.JOptionPane;
 
+import com.example.stock.dirkfw.display.util.DisplayUtil;
 import com.example.stock.mvc.model.EtatStockFormInput;
 import com.example.stock.mvc.service.EtatStockService;
 import com.example.stock.mvc.view.EtatStockView;
@@ -41,8 +42,7 @@ public class EtatStockController implements MouseListener {
             Vector<Object> data = EtatStockService.getEtatStockGeneral(date);
             this.view.getTable().setData(data);
         } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this.view, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            DisplayUtil.displayPopUpErr(this.view, ex);
         }
     }
 

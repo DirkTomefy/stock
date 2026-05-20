@@ -205,7 +205,6 @@ public class GenericFormPanel extends JPanel {
             for (DFWInput input : this.inputs.values()) {
                 FieldInfo fieldInfo = input.getFieldInfo();
                 Object value = input.getValue();
-                // debug: afficher le champ et la valeur récupérée
                 try {
                     String col = fieldInfo.getTableColumnName();
                     String valStr = (value == null) ? "null" : value.toString();
@@ -238,4 +237,29 @@ public class GenericFormPanel extends JPanel {
         }
         
     }
+
+    public void reloadInput() {
+        reloadComboboxes();
+        try {
+            for (DFWInput input : this.inputs.values()) {
+                try {
+                    FieldInfo fi = input.getFieldInfo();
+                    Object value = fi.getFieldValue(this.object);
+                    input.setValue(value);
+                    if (input instanceof JComponent) {
+                        JComponent comp = (JComponent) input;
+                        comp.revalidate();
+                        comp.repaint();
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
 }

@@ -10,6 +10,9 @@ import com.example.stock.dirkfw.annotation.db.TableName;
 
 @TableName("article")
 public class Article implements DirkFwModelTrait{
+    public Article() {
+    }
+
     @Override
     public String toString() {
         return "Article [id=" + id + ", libelle=" + libelle + "]";
@@ -22,6 +25,11 @@ public class Article implements DirkFwModelTrait{
 
     @ManytoOne(joinColumn = "sigle_gestion_stock", toDisplayOnCombobox = "toDisplayOnCombobox")
     MethodeGestionStock MethodGestionStock;
+
+    public Article(Integer id, String libelle) {
+        this.id = id;
+        this.libelle = libelle;
+    }
 
     public Integer getId() {
         return id;

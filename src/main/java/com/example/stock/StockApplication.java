@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import com.example.stock.dirkfw.display.classes.DFWFenetre;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 import com.example.stock.mvc.view.DetailFormView;
+import com.example.stock.mvc.view.EtatStockView;
 import com.example.stock.mvc.view.ArticleFormInsertView;
 import com.example.stock.mvc.view.MouvementFormInsertView;
 
@@ -21,6 +22,8 @@ public class StockApplication extends DFWFenetre{
 		addTab("Ajouter un mouvement", mouvementFormInsert);
 		DetailFormView detailFormView = new DetailFormView();
 		addTab("Détails mouvements", detailFormView);
+		EtatStockView etatStockView = new EtatStockView();
+		addTab("Etat de stock", etatStockView);
 	}
 	public StockApplication() throws ClassNotFoundException, SQLException{
 		super();

@@ -214,4 +214,6 @@ public class GenericTablePanel extends JTable {
 
         setRowHeight(25);
     }
+
+    
 }

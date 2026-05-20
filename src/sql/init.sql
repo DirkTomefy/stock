@@ -87,3 +87,25 @@ CREATE OR REPLACE VIEW mouvement_lifo AS
 SELECT *
 FROM mouvement
 ORDER BY date_mouvement DESC, id DESC;
+
+CREATE OR REPLACE VIEW etat_stock_general AS
+SELECT
+    a.id AS id_article,
+    a.libelle AS libelle_article,
+    a.sigle_gestion_stock,
+    COALESCE(lm.qte_stock, 0)::NUMERIC(15,2) AS qte_stock,
+    COALESCE(lm.money_value_stock, 0)::NUMERIC(15,2) AS money_value_stock,
+    COALESCE(lm.cump, 0)::NUMERIC(15,2) AS cump,
+    lm.date_mouvement AS date_dernier_mouvement
+FROM article a
+LEFT JOIN (
+    SELECT DISTINCT ON (m.id_article)
+        m.id_article,
+        m.qte_stock,
+        m.money_value_stock,
+        m.cump,
+        m.date_mouvement
+    FROM mouvement m
+    ORDER BY m.id_article, m.date_mouvement DESC, m.id DESC
+) lm ON lm.id_article = a.id
+ORDER BY a.id;

@@ -5,8 +5,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import com.example.stock.dirkfw.start.interfaces.DisplayableOnCombobox;
+import com.example.stock.dirkfw.start.interfaces.DisplayableOnList;
 
-public class OneToManyInfo implements DisplayableOnCombobox{
+public class OneToManyInfo implements DisplayableOnCombobox , DisplayableOnList{
     private Field field;
     private Method getter;
     private Method setter;
@@ -19,6 +20,7 @@ public class OneToManyInfo implements DisplayableOnCombobox{
     private Class<?> childClass;
 
     public Method onComboboxMethod;
+    public Method onListMethod;
 
     public OneToManyInfo(Field field, Method getter, Method setter, Field mappedByField,
             Method childGetter, Method childSetter, Constructor<?> childConstructor,
@@ -90,5 +92,16 @@ public class OneToManyInfo implements DisplayableOnCombobox{
     @Override
     public Method getMethodOnCombobox() throws Exception {
         return this.onComboboxMethod;
+    }
+
+    @Override
+    public void initMethodOnList() throws Exception {
+        this.onListMethod=this.field.getType().getMethod("toDisplayOnList");
+               
+    }
+
+    @Override
+    public Method getMethodOnList() throws Exception {
+       return this.onListMethod;
     }
 }

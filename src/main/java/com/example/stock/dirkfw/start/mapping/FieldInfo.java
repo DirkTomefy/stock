@@ -16,7 +16,7 @@ import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 
-public class FieldInfo {
+public class FieldInfo{
     Field reflectField;
 
     Method getter;
@@ -24,6 +24,8 @@ public class FieldInfo {
     String tableColumnName;
     boolean manyToOne;
     Class<?> manyToOneType;
+
+    
 
 
     public String getTableColumnName() {
@@ -261,5 +263,7 @@ public class FieldInfo {
     public void setManyToOneType(Class<?> manyToOneType) {
         this.manyToOneType = manyToOneType;
     }
+
+    
 
 }

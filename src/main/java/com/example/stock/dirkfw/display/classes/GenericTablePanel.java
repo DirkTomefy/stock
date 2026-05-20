@@ -11,11 +11,11 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import com.example.stock.dirkfw.DirkFwConfig;
-import com.example.stock.dirkfw.annotation.display.DisplayOnList;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation; 
 import com.example.stock.dirkfw.annotation.display.PrimaryOnList;
 import com.example.stock.dirkfw.annotation.display.SkipTableList;
 import com.example.stock.dirkfw.start.interfaces.DisplayableOnCombobox;
+import com.example.stock.dirkfw.start.interfaces.DisplayableOnList;
 import com.example.stock.dirkfw.start.mapping.FieldInfo;
 import com.example.stock.dirkfw.start.mapping.TableMap;
 
@@ -148,12 +148,10 @@ public class GenericTablePanel extends JTable {
             return "";
         }
 
-        if (field.getReflectField().isAnnotationPresent(DisplayOnList.class)) {
-            DisplayOnList anno = field.getReflectField().getAnnotation(DisplayOnList.class);
-            String methodName = anno.value();
+        if(field instanceof DisplayableOnList f){
             try {
-                Method method = value.getClass().getMethod(methodName);
-                Object result = method.invoke(value);
+                Method dispMethod = f.getMethodOnList();
+                Object result = dispMethod.invoke(value);
                 return result == null ? "" : result.toString();
             } catch (Exception ex) {
                 return value.toString();

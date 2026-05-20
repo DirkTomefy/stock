@@ -2,10 +2,11 @@ package com.example.stock.mvc.model;
 
 import java.time.LocalDateTime;
 
+import com.example.stock.dirkfw.DirkFwModelTrait;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.TableColumnName;
 
-public class DetailFormInput {
+public class DetailFormInput implements DirkFwModelTrait{
     
     
     @ManytoOne(joinColumn = "id_article", toDisplayOnCombobox = "toDisplayOnCombobox")

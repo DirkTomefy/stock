@@ -1,5 +1,6 @@
 package com.example.stock.mvc.model;
 
+import com.example.stock.dirkfw.DirkFwModelTrait;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.TableName;
@@ -8,7 +9,7 @@ import com.example.stock.dirkfw.annotation.db.TableName;
 
 
 @TableName("article")
-public class Article {
+public class Article implements DirkFwModelTrait{
     @Override
     public String toString() {
         return "Article [id=" + id + ", libelle=" + libelle + "]";
@@ -46,10 +47,12 @@ public class Article {
         MethodGestionStock = methodGestionStock;
     }
 
+    @Override
     public String toDisplayOnCombobox() {
         return libelle;
     }
     
+    @Override
     public String toDisplayOnList(){
         return libelle;
     }

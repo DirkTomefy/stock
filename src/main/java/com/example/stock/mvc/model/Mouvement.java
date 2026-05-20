@@ -1,6 +1,7 @@
 package com.example.stock.mvc.model;
 import java.time.LocalDateTime;
 
+import com.example.stock.dirkfw.DirkFwModelTrait;
 import com.example.stock.dirkfw.annotation.db.IdField;
 import com.example.stock.dirkfw.annotation.db.ManytoOne;
 import com.example.stock.dirkfw.annotation.db.RecursiveCall;
@@ -8,12 +9,11 @@ import com.example.stock.dirkfw.annotation.db.TableColumnName;
 import com.example.stock.dirkfw.annotation.db.TableName;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.annotation.display.IgnoreFormulaire;
-import com.example.stock.dirkfw.annotation.display.DisplayOnList;
 import com.example.stock.dirkfw.annotation.display.PrimaryOnList;
 import com.example.stock.dirkfw.annotation.display.SkipTableList;
 
 @TableName("mouvement")
-public class Mouvement {
+public class Mouvement implements DirkFwModelTrait{
     @IdField
     Integer id;
 
@@ -21,7 +21,7 @@ public class Mouvement {
     Article article;
 
     @TableColumnName("type")
-    String typeMouvement; // "ENTREE" ou "SORTIE"
+    String typeMouvement;
 
     @TableColumnName("date_mouvement")
     LocalDateTime dateMouvement;
@@ -47,7 +47,6 @@ public class Mouvement {
 
     @IgnoreDisplayOpperation
     @RecursiveCall("source_id")
-    @DisplayOnList("toDisplayOnList")
     Mouvement source;
 
     @TableColumnName("qte_prise")
@@ -192,9 +191,12 @@ public class Mouvement {
                 + ", quantitePrise=" + quantitePrise + ", totalPriseForEntree=" + totalPriseForEntree + "]";
     }
 
+    @Override
     public String toDisplayOnList() {
         return "Mouvement#"+this.id;
     }
+
+    @Override
     public String toDisplayOnCombobox(){
         return "Mouvement#"+this.id;
     }

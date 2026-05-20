@@ -7,18 +7,21 @@ import com.example.stock.dirkfw.err.NoGetterAvailable;
 import com.example.stock.dirkfw.err.NoSetterAvailable;
 import com.example.stock.dirkfw.err.db.NonSqlTypeErr;
 import com.example.stock.dirkfw.start.interfaces.DisplayableOnCombobox;
+import com.example.stock.dirkfw.start.interfaces.DisplayableOnList;
 
 
 
-public class RecursiveFieldInfo extends FieldInfo implements DisplayableOnCombobox{
+public class RecursiveFieldInfo extends FieldInfo implements DisplayableOnCombobox ,  DisplayableOnList{
 
     private String recursiveColumnName;
     private Method onComboboxMethod;
+    private Method onListMethod;
 
     public RecursiveFieldInfo(Field value, Method getter, Method setter, String recursiveColumnName) throws NoSuchMethodException {
         super(value, getter, setter);
         this.recursiveColumnName = recursiveColumnName;
         initMethodOnCombobox();
+        initMethodOnList();
     }
 
     public String getRecursiveColumnName() {
@@ -55,6 +58,16 @@ public class RecursiveFieldInfo extends FieldInfo implements DisplayableOnCombob
     @Override
     public Method getMethodOnCombobox() {
         return this.onComboboxMethod;
+    }
+
+    @Override
+    public void initMethodOnList() throws NoSuchMethodException {
+      this.onListMethod = this.reflectField.getType().getMethod("toDisplayOnCombobox");
+    }
+
+    @Override
+    public Method getMethodOnList() {
+        return onListMethod;
     }
 
 }

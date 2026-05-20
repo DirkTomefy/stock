@@ -4,23 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseContext implements AutoCloseable{
+import io.github.cdimascio.dotenv.Dotenv;
 
-    private static final String URL =
-            "jdbc:postgresql://localhost:5432/stock";
+public class DatabaseContext {
 
-    private  static final String USER =
-            "postgres";
-
-    private static final String PASSWORD =
-            "etu003948";
+    private static final Dotenv dotenv = Dotenv.load();
+    
+    private static final String URL = dotenv.get("DB_URL");
+    private static final String USER = dotenv.get("DB_USER");
+    private static final String PASSWORD = dotenv.get("DB_PASSWORD");
 
     
     
-    public Connection getConnection() throws SQLException, ClassNotFoundException {
-        return createNewConnection();
-    }
-     
+    
     public static Connection createNewConnection() throws SQLException, ClassNotFoundException {
         try {
             Class.forName("org.postgresql.Driver");
@@ -34,8 +30,5 @@ public class DatabaseContext implements AutoCloseable{
         }
     }
     
-    @Override
-    public void close() throws Exception {
-        //TODO :
-    }
+    
 }

@@ -24,11 +24,10 @@ public class MouvementFormController implements MouseListener {
         try {
             MouvementService.insertMouvement(mouvement);
             JOptionPane.showMessageDialog(this.view, "Mouvement inséré avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
+            this.view.resetObject();
         } catch (Exception e1) { 
             DisplayUtil.displayPopUpErr(this.view, e1);
-            throw new RuntimeException(e1);
         }
-        this.view.resetObject();
     }
 
     @Override

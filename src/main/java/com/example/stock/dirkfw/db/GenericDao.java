@@ -29,20 +29,20 @@ public class GenericDao implements AutoCloseable {
     }
 
     private void executeWithConnection(ConnectionOperation operation) throws Exception {
-        try (DatabaseContext databaseContext = new DatabaseContext()) {
-            try (Connection conn = databaseContext.getConnection()) {
+      
+            try (Connection conn = DatabaseContext.createNewConnection()) {
                 conn.setAutoCommit(false);
                 operation.execute(conn);
                 conn.commit();
             }
-        }
+        
     }
 
     private <T> T executeQueryWithConnection(ConnectionQuery<T> query) throws Exception {
-         try (DatabaseContext databaseContext = new DatabaseContext()) {
-        try (Connection conn = databaseContext.getConnection()) {
+       
+        try (Connection conn = DatabaseContext.createNewConnection()) {
             return query.execute(conn);
-        }
+        
     }
     }
 

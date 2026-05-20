@@ -5,6 +5,7 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JOptionPane;
 
+import com.example.stock.dirkfw.display.util.DisplayUtil;
 import com.example.stock.mvc.service.ArticleService;
 import com.example.stock.mvc.view.ArticleFormInsertView;
 
@@ -27,8 +28,7 @@ public class ArticleFormController implements MouseListener{
                     JOptionPane.INFORMATION_MESSAGE);
             this.view.resetObject();
         } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this.view, "Erreur : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            DisplayUtil.displayPopUpErr(this.view, ex);
         }
     }
 

@@ -12,6 +12,7 @@ import com.example.stock.mvc.controller.DetailFormController;
 import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.DetailFormInput;
 import com.example.stock.mvc.model.EtatStock;
+import com.example.stock.mvc.service.MouvementDetailService;
 
 public class DetailFormView extends JPanel {
 
@@ -35,14 +36,16 @@ public class DetailFormView extends JPanel {
         add(new JScrollPane(this.table), BorderLayout.CENTER);
     }
 
-    public DetailFormView(EtatStock etatstock) throws ClassNotFoundException, SQLException{
+    public DetailFormView(EtatStock etatstock) throws Exception{
         setLayout(new BorderLayout(10, 10));
         this.form = new GenericFormPanel(new DetailFormInput(), null);
         this.table = new GenericTablePanel();
         initView();
         DetailFormInput dFormInput=(DetailFormInput) this.form.getObject();
         dFormInput.setDate(etatstock.getDateDernierMouvement());
-        dFormInput.setArticle(new Article(etatstock.getIdArticle(),etatstock.getLibelleArticle()));
+        dFormInput.setArticle(new Article(etatstock));
+
+        this.table.setData(MouvementDetailService.findDetails(dFormInput));
         this.form.reloadInput();
     }
 

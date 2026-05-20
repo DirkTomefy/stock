@@ -31,6 +31,10 @@ public class Article implements DirkFwModelTrait{
         this.libelle = libelle;
     }
 
+    public Article(EtatStock etatStock){
+        this.id=etatStock.getIdArticle();
+        this.libelle=etatStock.getLibelleArticle();
+    }
     public Integer getId() {
         return id;
     }

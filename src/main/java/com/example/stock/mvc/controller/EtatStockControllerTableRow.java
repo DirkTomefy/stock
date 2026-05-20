@@ -2,7 +2,6 @@ package com.example.stock.mvc.controller;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLException;
 
 import com.example.stock.dirkfw.display.classes.GenericTablePanel;
 import com.example.stock.dirkfw.display.util.DisplayUtil;
@@ -26,7 +25,7 @@ public class EtatStockControllerTableRow implements MouseListener{
                 EtatStock data = (EtatStock) tablePanel.getData().get(row);
                 try {
                     DisplayUtil.displayPopUp(new DetailFormView(data), "Tital");
-                } catch (ClassNotFoundException | SQLException e1) {
+                } catch (Exception e1) {
                     e1.printStackTrace();
                 }
             }

@@ -43,6 +43,7 @@ public class DetailFormView extends JPanel {
         initView();
         DetailFormInput dFormInput=(DetailFormInput) this.form.getObject();
         dFormInput.setDate(etatstock.getDateDernierMouvement());
+        //TODO : prendre depuis le dao fa tsy maina
         dFormInput.setArticle(new Article(etatstock));
 
         this.table.setData(MouvementDetailService.findDetails(dFormInput));

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.mvc.controller.DetailFormController;
 import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.DetailFormInput;
@@ -19,7 +20,6 @@ public class DetailFormView extends JPanel {
     private final DetailFormPanel form;
     private final DetailTablePanel table;
 
-    
     public DetailFormView() throws ClassNotFoundException, SQLException {
         setLayout(new BorderLayout(10, 10));
 
@@ -28,7 +28,7 @@ public class DetailFormView extends JPanel {
         initView();
     }
 
-    public void initView(){
+    public void initView() {
         DetailFormController controller = new DetailFormController(this);
         this.form.setValidateFormListener(controller);
 
@@ -36,15 +36,20 @@ public class DetailFormView extends JPanel {
         add(new JScrollPane(this.table), BorderLayout.CENTER);
     }
 
-    public DetailFormView(EtatStock etatstock) throws Exception{
+    public DetailFormView(EtatStock etatstock) throws Exception {
         setLayout(new BorderLayout(10, 10));
         this.form = new DetailFormPanel();
         this.table = new DetailTablePanel();
         initView();
-        DetailFormInput dFormInput=(DetailFormInput) this.form.getObject();
+        DetailFormInput dFormInput = (DetailFormInput) this.form.getObject();
         dFormInput.setDate(etatstock.getDateDernierMouvement());
-        //TODO : prendre depuis le dao fa tsy maina
-        dFormInput.setArticle(new Article(etatstock));
+
+        try (GenericDao dao = new GenericDao()) {
+            Article t = new Article(etatstock);
+            dao.findById(t);
+            dFormInput.setArticle(t);
+
+        }
 
         this.table.setData(MouvementDetailService.findDetails(dFormInput));
         this.form.reloadInput();

@@ -11,7 +11,7 @@ import com.example.stock.mvc.service.MouvementService;
 import com.example.stock.mvc.view.MouvementFormInsertView;
 
 public class MouvementFormController implements MouseListener {
-    MouvementFormInsertView view;
+    private final MouvementFormInsertView view;
 
     public MouvementFormController(MouvementFormInsertView view) {
         this.view = view;

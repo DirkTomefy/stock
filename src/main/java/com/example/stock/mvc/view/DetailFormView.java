@@ -6,25 +6,25 @@ import java.sql.SQLException;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.example.stock.dirkfw.display.classes.GenericFormPanel;
-import com.example.stock.dirkfw.display.classes.GenericTablePanel;
 import com.example.stock.mvc.controller.DetailFormController;
 import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.DetailFormInput;
 import com.example.stock.mvc.model.EtatStock;
 import com.example.stock.mvc.service.MouvementDetailService;
+import com.example.stock.mvc.view.module.form.DetailFormPanel;
+import com.example.stock.mvc.view.module.table.DetailTablePanel;
 
 public class DetailFormView extends JPanel {
 
-    private final GenericFormPanel form;
-    private final GenericTablePanel table;
+    private final DetailFormPanel form;
+    private final DetailTablePanel table;
 
     
     public DetailFormView() throws ClassNotFoundException, SQLException {
         setLayout(new BorderLayout(10, 10));
 
-        this.form = new GenericFormPanel(new DetailFormInput(), null);
-        this.table = new GenericTablePanel();
+        this.form = new DetailFormPanel();
+        this.table = new DetailTablePanel();
         initView();
     }
 
@@ -38,8 +38,8 @@ public class DetailFormView extends JPanel {
 
     public DetailFormView(EtatStock etatstock) throws Exception{
         setLayout(new BorderLayout(10, 10));
-        this.form = new GenericFormPanel(new DetailFormInput(), null);
-        this.table = new GenericTablePanel();
+        this.form = new DetailFormPanel();
+        this.table = new DetailTablePanel();
         initView();
         DetailFormInput dFormInput=(DetailFormInput) this.form.getObject();
         dFormInput.setDate(etatstock.getDateDernierMouvement());
@@ -49,11 +49,11 @@ public class DetailFormView extends JPanel {
         this.form.reloadInput();
     }
 
-    public GenericFormPanel getForm() {
+    public DetailFormPanel getForm() {
         return form;
     }
 
-    public GenericTablePanel getTable() {
+    public DetailTablePanel getTable() {
         return table;
     }
 }

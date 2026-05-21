@@ -47,7 +47,7 @@ public class GenericTablePanel extends JTable {
         return (rowIndex >= 0 && rowIndex < data.size()) ? data.get(rowIndex) : null;
     }
 
-    private void rebuildModel() {
+    protected void rebuildModel() {
         DefaultTableModel model = createReadOnlyModel();
 
         if (data.isEmpty()) {
@@ -64,7 +64,7 @@ public class GenericTablePanel extends JTable {
         applyColumnRenderers();
     }
 
-    private DefaultTableModel createReadOnlyModel() {
+    protected DefaultTableModel createReadOnlyModel() {
         return new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -73,12 +73,12 @@ public class GenericTablePanel extends JTable {
         };
     }
 
-    private TableMap getTableMapForFirstObject() {
+    protected TableMap getTableMapForFirstObject() {
         Object first = data.firstElement();
         return DirkFwConfig.getClassInfos().get(first.getClass().getName());
     }
 
-    private Vector<FieldInfo> buildDisplayableFields(TableMap tableMap) {
+    protected Vector<FieldInfo> buildDisplayableFields(TableMap tableMap) {
         Vector<FieldInfo> fields = new Vector<>();
 
         FieldInfo idField = tableMap.getFieldID();
@@ -98,7 +98,7 @@ public class GenericTablePanel extends JTable {
         return fields;
     }
 
-    private Vector<String> buildColumnHeaders(Vector<FieldInfo> fields) {
+    protected Vector<String> buildColumnHeaders(Vector<FieldInfo> fields) {
         Vector<String> columns = new Vector<>();
 
         for (FieldInfo field : fields) {
@@ -108,7 +108,7 @@ public class GenericTablePanel extends JTable {
         return columns;
     }
 
-    private void buildTableRows(TableMap tableMap, Vector<FieldInfo> displayFields, Vector<String> columnNames, DefaultTableModel model) {
+    protected void buildTableRows(TableMap tableMap, Vector<FieldInfo> displayFields, Vector<String> columnNames, DefaultTableModel model) {
         for (String columnName : columnNames) {
             model.addColumn(columnName);
         }
@@ -125,7 +125,7 @@ public class GenericTablePanel extends JTable {
         }
     }
 
-    private Vector<Object> extractRowData(Vector<FieldInfo> displayFields, Object obj) {
+    protected Vector<Object> extractRowData(Vector<FieldInfo> displayFields, Object obj) {
         Vector<Object> row = new Vector<>();
 
         try {
@@ -143,7 +143,7 @@ public class GenericTablePanel extends JTable {
         return row;
     }
 
-    private Object formatDisplayValue(FieldInfo field, Object value) {
+    protected Object formatDisplayValue(FieldInfo field, Object value) {
         if (value == null) {
             return "";
         }
@@ -178,7 +178,7 @@ public class GenericTablePanel extends JTable {
         return value.toString();
     }
 
-    private void applyColumnRenderers() {
+    protected void applyColumnRenderers() {
         DefaultTableCellRenderer primaryRenderer = new DefaultTableCellRenderer() {
             @Override
             public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,

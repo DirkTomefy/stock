@@ -6,22 +6,21 @@ import java.sql.SQLException;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import com.example.stock.dirkfw.display.classes.GenericFormPanel;
-import com.example.stock.dirkfw.display.classes.GenericTablePanel;
 import com.example.stock.mvc.controller.EtatStockController;
 import com.example.stock.mvc.controller.EtatStockControllerTableRow;
-import com.example.stock.mvc.model.EtatStockFormInput;
+import com.example.stock.mvc.view.module.form.EtatStockFormPanel;
+import com.example.stock.mvc.view.module.table.EtatStockTablePanel;
 
 public class EtatStockView extends JPanel {
 
-    private final GenericFormPanel form;
-    private final GenericTablePanel table;
+    private final EtatStockFormPanel form;
+    private final EtatStockTablePanel table;
 
     public EtatStockView() throws ClassNotFoundException, SQLException {
         setLayout(new BorderLayout(10, 10));
 
-        this.form = new GenericFormPanel(new EtatStockFormInput(), null);
-        this.table = new GenericTablePanel();
+        this.form = new EtatStockFormPanel();
+        this.table = new EtatStockTablePanel();
 
         EtatStockController formController = new EtatStockController(this);
         this.form.setValidateFormListener(formController);
@@ -34,11 +33,11 @@ public class EtatStockView extends JPanel {
         formController.loadDataNow();
     }
 
-    public GenericFormPanel getForm() {
+    public EtatStockFormPanel getForm() {
         return form;
     }
 
-    public GenericTablePanel getTable() {
+    public EtatStockTablePanel getTable() {
         return table;
     }
 }

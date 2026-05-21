@@ -74,13 +74,13 @@ public class GenericFormPanel extends JPanel {
         add(createButtonPanel(this.validateButton), BorderLayout.SOUTH);
     }
 
-    private boolean isDisplayable(Field field) {
+    protected boolean isDisplayable(Field field) {
         return !TableMap.isIdField(field)
                 && !field.isAnnotationPresent(IgnoreDisplayOpperation.class)
                 && !field.isAnnotationPresent(IgnoreFormulaire.class);
     }
 
-    private void addField(FieldInfo fieldInfo, JPanel panel) {
+    protected void addField(FieldInfo fieldInfo, JPanel panel) {
         JPanel fieldPanel = new JPanel();
         fieldPanel.setLayout(new BoxLayout(fieldPanel, BoxLayout.X_AXIS));
         fieldPanel.setBackground(new Color(245, 245, 245));
@@ -109,7 +109,7 @@ public class GenericFormPanel extends JPanel {
         panel.add(Box.createVerticalStrut(10));
     }
 
-    private DFWInput createManyToOneInput(FieldInfo fieldInfo) {
+    protected DFWInput createManyToOneInput(FieldInfo fieldInfo) {
         Vector<Object> items = new Vector<>();
         try (GenericDao dao = new GenericDao()) {
             Class<?> t = fieldInfo.getReflectField().getType();
@@ -125,11 +125,11 @@ public class GenericFormPanel extends JPanel {
         return new DFWComboBox(fieldInfo, object, items);
     }
 
-    private boolean isDateTimeField(Field field) {
+    protected boolean isDateTimeField(Field field) {
         return field.getType() == LocalDateTime.class;
     }
 
-    private JPanel createButtonPanel(JButton boutonValider) {
+    protected JPanel createButtonPanel(JButton boutonValider) {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
         buttonPanel.setBackground(new Color(245, 245, 245));
@@ -155,7 +155,7 @@ public class GenericFormPanel extends JPanel {
         return buttonPanel;
     }
 
-    private void reloadComboboxes() {
+    protected void reloadComboboxes() {
         for (DFWInput input : this.inputs.values()) {
             if (input instanceof DFWComboBox) {
                 DFWComboBox combo = (DFWComboBox) input;
@@ -174,7 +174,7 @@ public class GenericFormPanel extends JPanel {
         }
     }
 
-    private JButton createButton() {
+    protected JButton createButton() {
         JButton validateButton = new JButton("Valider");
         validateButton.setFont(new Font("Arial", Font.BOLD, 12));
         validateButton.setBackground(new Color(70, 130, 180));

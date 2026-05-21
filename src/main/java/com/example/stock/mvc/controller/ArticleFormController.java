@@ -10,7 +10,7 @@ import com.example.stock.mvc.service.ArticleService;
 import com.example.stock.mvc.view.ArticleFormInsertView;
 
 public class ArticleFormController implements MouseListener{
-    ArticleFormInsertView view;
+    private final ArticleFormInsertView view;
 
     public ArticleFormController(ArticleFormInsertView view) {
         this.view = view;

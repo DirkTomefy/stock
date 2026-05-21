@@ -110,24 +110,17 @@ public class MouvementService {
     }
 
     public static void insertMouvmentAsFIFOENTREE(Object mouvement) throws Exception {
-
-        if (!(mouvement instanceof Mouvement))
-            return;
-        Mouvement m = (Mouvement) mouvement;
-
-        Mouvement last = getLastMouvementInfo(m.getArticle(), m.getDateMouvement());
-
-        processEntreeForLifoFifo(m, last);
-
-        try (GenericDao dao = new GenericDao()) {
-            dao.save(m);
-        }
+        insertMouvementGobalFifoLifoEntree(mouvement);
     }
 
    
     public static void insertMouvmentAsLIFOENTREE(Object mouvement) throws Exception {
+        insertMouvementGobalFifoLifoEntree(mouvement);
+    }
 
-        if (!(mouvement instanceof Mouvement))
+    
+    public static void insertMouvementGobalFifoLifoEntree(Object mouvement) throws Exception{
+         if (!(mouvement instanceof Mouvement))
             return;
         Mouvement m = (Mouvement) mouvement;
 
@@ -140,15 +133,12 @@ public class MouvementService {
         }
     }
 
-    
     public static void insertMouvmentAsFIFOSORTIE(Object mouvement) throws Exception {
-
         processSortie(mouvement, "mouvement_fifo");
     }
 
     
     public static void insertMouvmentAsLIFOSORTIE(Object mouvement) throws Exception {
-
         processSortie(mouvement, "mouvement_lifo");
     }
 

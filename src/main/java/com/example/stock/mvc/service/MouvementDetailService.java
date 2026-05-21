@@ -17,8 +17,32 @@ public class MouvementDetailService {
             where.setArticle(input.getArticle());
             where.setDateMouvement(input.getDate());
             
-            System.out.println(""+input.getDate());
-            return dao.findAll(where, operations);
+            Vector<Object> list=dao.findAll(where,operations);
+            handleTotalEntreeAll(list);
+            return list;
+        }
+    }
+
+    public static int getTotalPriseForEntree(Mouvement maybeEntree,Vector<Object> maybeSorties){
+        int retour=0;
+        for (Object object : maybeSorties) {
+            Mouvement m = (Mouvement) object;
+            if(m.getSource()!=null && m.getTypeMouvement().getSigle().equals("SORTIE")){
+                   if(m.getSource().getId().equals(maybeEntree.getId())) retour+=m.getQuantitePrise(); 
+            }
+         
+        }
+        return retour;
+    }
+    public static void handleTotalSortieForEntreeByDate(Mouvement maybeEntree,Vector<Object> maybeSorties){
+        if(maybeEntree.getTypeMouvement().getSigle().equalsIgnoreCase("SORTIE")) return;
+       
+       maybeEntree.setTotalPriseForEntree(getTotalPriseForEntree(maybeEntree, maybeSorties));
+    }
+
+    public static void handleTotalEntreeAll(Vector<Object> maybeEntrees){
+        for (Object object : maybeEntrees) {
+            handleTotalSortieForEntreeByDate((Mouvement) object, maybeEntrees);
         }
     }
 }

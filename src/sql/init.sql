@@ -30,6 +30,19 @@ CREATE TABLE article (
 
 
 -- ============================================
+-- TABLE : type_mouvement
+-- ============================================
+
+CREATE TABLE type_mouvement (
+    sigle VARCHAR(50) PRIMARY KEY
+);
+
+INSERT INTO type_mouvement(sigle) VALUES
+('ENTREE'),
+('SORTIE');
+
+
+-- ============================================
 -- TABLE : mouvement
 -- ============================================
 
@@ -38,7 +51,7 @@ CREATE TABLE mouvement (
 
     id_article INT NOT NULL,
 
-    type VARCHAR(200) NOT NULL,
+    type VARCHAR(50) NOT NULL,
 
     date_mouvement TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -48,9 +61,9 @@ CREATE TABLE mouvement (
 
     valeur NUMERIC(15,2) ,
 
-    qte_prise NUMERIC(15,2) NOT NULL DEFAULT 0,
+    qte_prise NUMERIC(15,2) DEFAULT 0,
 
-    total_prise_for_entree NUMERIC(15,2) NOT NULL DEFAULT 0,
+    total_prise_for_entree NUMERIC(15,2) ,
 
     qte_stock NUMERIC(15,2),
 
@@ -63,6 +76,10 @@ CREATE TABLE mouvement (
     CONSTRAINT fk_mouvement_article
         FOREIGN KEY (id_article)
         REFERENCES article(id),
+
+    CONSTRAINT fk_mouvement_type
+        FOREIGN KEY (type)
+        REFERENCES type_mouvement(sigle),
 
     CONSTRAINT fk_mouvement_source
         FOREIGN KEY (source_id)
@@ -109,3 +126,15 @@ LEFT JOIN (
     ORDER BY m.id_article, m.date_mouvement DESC, m.id DESC
 ) lm ON lm.id_article = a.id
 ORDER BY a.id;
+
+
+
+DELETE FROM mouvement where type='SORTIE';
+
+UPDATE mouvement
+SET total_prise_for_entree = 0 ,  qte_prise=0;
+
+
+UPDATE mouvement
+SET source_id = null;
+

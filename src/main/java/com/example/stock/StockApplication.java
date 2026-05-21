@@ -27,7 +27,7 @@ public class StockApplication extends DFWFenetre{
 	}
 	public StockApplication() throws ClassNotFoundException, SQLException{
 		super();
-		setTitle("Stock Management");
+		setTitle("ETU003948");
 		setSize(800, 600);
 		setLocationRelativeTo(null);
 		initOnglet();

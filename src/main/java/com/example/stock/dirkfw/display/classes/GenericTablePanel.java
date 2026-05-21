@@ -23,6 +23,7 @@ public class GenericTablePanel extends JTable {
 
     private Vector<Object> data;
     private Vector<Integer> primaryColumns;
+   
 
     public GenericTablePanel() {
         this(new Vector<>());
@@ -179,7 +180,18 @@ public class GenericTablePanel extends JTable {
     }
 
     protected void applyColumnRenderers() {
-        DefaultTableCellRenderer primaryRenderer = new DefaultTableCellRenderer() {
+        DefaultTableCellRenderer renderer = createDefaultCellRenderer();
+
+        for (int i = 0; i < getColumnCount(); i++) {
+            TableColumn col = getColumnModel().getColumn(i);
+            col.setCellRenderer(renderer);
+        }
+
+        setRowHeight(25);
+    }
+
+    protected DefaultTableCellRenderer createDefaultCellRenderer() {
+        return new DefaultTableCellRenderer() {
             @Override
             public java.awt.Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
                     boolean hasFocus, int row, int column) {
@@ -206,13 +218,6 @@ public class GenericTablePanel extends JTable {
                 return cell;
             }
         };
-
-        for (int i = 0; i < getColumnCount(); i++) {
-            TableColumn col = getColumnModel().getColumn(i);
-            col.setCellRenderer(primaryRenderer);
-        }
-
-        setRowHeight(25);
     }
 
     

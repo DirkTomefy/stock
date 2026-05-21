@@ -8,6 +8,7 @@ import com.example.stock.dirkfw.db.GenericDao;
 import com.example.stock.dirkfw.db.util.ComparaisonOperation;
 import com.example.stock.mvc.model.Article;
 import com.example.stock.mvc.model.Mouvement;
+import com.example.stock.mvc.model.TypeMouvement;
 
 public class MouvementService {
 
@@ -50,7 +51,7 @@ public class MouvementService {
     
     private static void processEntreeForLifoFifo(Mouvement m, Mouvement last) {
 
-        m.setTypeMouvement("ENTREE");
+        m.setTypeMouvement(new TypeMouvement("ENTREE"));
 
         m.setValeur(calcValeur(m));
 
@@ -64,28 +65,39 @@ public class MouvementService {
         m.setSource(null);
     }
 
+    public static void makeDefaultValByLast(Mouvement m, Mouvement last){
+         if (!m.getTypeMouvement().getSigle().equals("ENTREE")){
+            m.setPu(last.getCump());
+            m.setQteStock(last.getQteStock() - m.getQuantite());
+            m.setValeur(m.getPu()*m.getQuantite());
+            m.setMoneyValueStock(m.getQteStock()*last.getCump());
+            m.setCump(last.getCump());
+        }
+    }
     
-    public static void insertMouvementAsCUMP(Object mouvement) throws Exception {
+    public static void insertMouvementAsCUMP(Object mouvement,Mouvement last) throws Exception {
 
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;
 
-        Mouvement last = getLastMouvementInfo(m.getArticle(), m.getDateMouvement());
+        
 
         m.setValeur(calcValeur(m));
 
-        if (m.getTypeMouvement().equals("ENTREE")) {
+        if (m.getTypeMouvement().getSigle().equals("ENTREE")) {
 
             m.setQteStock(last.getQteStock() + m.getQuantite());
             m.setMoneyValueStock(last.getMoneyValueStock() + m.getValeur());
-
+            m.setCump(m.getMoneyValueStock() / m.getQteStock());
+            
         } else {
-
+            m.setPu(last.getCump());
             m.setQteStock(last.getQteStock() - m.getQuantite());
-            m.setMoneyValueStock(last.getMoneyValueStock() - m.getValeur());
+            m.setValeur(m.getPu()*m.getQuantite());
+            m.setMoneyValueStock(m.getQteStock()*last.getCump());
+            m.setCump(last.getCump());
         }
 
-        m.setCump(m.getMoneyValueStock() / m.getQteStock());
         
         try (GenericDao dao = new GenericDao()) {
             dao.save(m);
@@ -152,7 +164,7 @@ public class MouvementService {
         Mouvement last = getLastMouvementInfo(sortie.getArticle(), sortie.getDateMouvement());
         double stockRestantTotal = last.getQteStock() == null ? 0.0 : last.getQteStock();
         double moneyRestantTotal = last.getMoneyValueStock() == null ? 0.0 : last.getMoneyValueStock();
-        // Utiliser une seule connexion pour garantir atomicité des updates et inserts
+        
         try (java.sql.Connection conn = com.example.stock.context.DatabaseContext.createNewConnection()) {
             try {
                 conn.setAutoCommit(false);
@@ -203,7 +215,7 @@ public class MouvementService {
 
                         int nouvellePrise = dejaPrise + prise;
                         entree.setTotalPriseForEntree(nouvellePrise);
-                        // utiliser writeDao (sans alterName) pour mettre à jour la vraie table `mouvement`
+                        
                         writeDao.update(entree, conn);
 
                         m.setQteStock(stockRestantTotal);
@@ -227,7 +239,7 @@ public class MouvementService {
         Mouvement m = new Mouvement();
 
         m.setArticle(sortie.getArticle());
-        m.setTypeMouvement("SORTIE");
+        m.setTypeMouvement(new TypeMouvement("SORTIE"));
         m.setDateMouvement(sortie.getDateMouvement());
 
         m.setSource(entree);
@@ -249,9 +261,11 @@ public class MouvementService {
     
     public static  void insertMouvement(Object mouvement) throws Exception {
 
+        
         if (!(mouvement instanceof Mouvement)) return;
         Mouvement m = (Mouvement) mouvement;
-        
+        Mouvement last = getLastMouvementInfo(m.getArticle(), m.getDateMouvement());
+        makeDefaultValByLast(m, last);
         if (m.getArticle() != null && m.getArticle().getId() == null) {
             try (GenericDao dao = new GenericDao()) {
                 Article where = new Article();
@@ -271,19 +285,20 @@ public class MouvementService {
 
         if (m.getArticle() == null || m.getArticle().getMethodGestionStock() == null
                 || m.getArticle().getMethodGestionStock().getSigle() == null) {
-            insertMouvementAsCUMP(m);
+            insertMouvementAsCUMP(m,last);
             return;
         }
 
         String sigle = m.getArticle().getMethodGestionStock().getSigle();
+        String typeSigle = m.getTypeMouvement() != null ? m.getTypeMouvement().getSigle() : null;
 
         switch (sigle) {
         case "CUMP":
-            insertMouvementAsCUMP(m);
+            insertMouvementAsCUMP(m,last);
             break;
 
         case "FIFO":
-            if ("ENTREE".equalsIgnoreCase(m.getTypeMouvement())) {
+            if ("ENTREE".equalsIgnoreCase(typeSigle)) {
                 insertMouvmentAsFIFOENTREE(m);
             } else {
                 insertMouvmentAsFIFOSORTIE(m);
@@ -291,7 +306,7 @@ public class MouvementService {
             break;
 
         case "LIFO":
-            if ("ENTREE".equalsIgnoreCase(m.getTypeMouvement())) {
+            if ("ENTREE".equalsIgnoreCase(typeSigle)) {
                 insertMouvmentAsLIFOENTREE(m);
             } else {
                 insertMouvmentAsLIFOSORTIE(m);
@@ -300,7 +315,7 @@ public class MouvementService {
 
         default:
             
-            insertMouvementAsCUMP(m);
+            insertMouvementAsCUMP(m,last);
             break;
         }
     }

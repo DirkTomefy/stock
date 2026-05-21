@@ -10,7 +10,6 @@ import com.example.stock.dirkfw.annotation.db.TableName;
 import com.example.stock.dirkfw.annotation.display.IgnoreDisplayOpperation;
 import com.example.stock.dirkfw.annotation.display.IgnoreFormulaire;
 import com.example.stock.dirkfw.annotation.display.PrimaryOnList;
-import com.example.stock.dirkfw.annotation.display.SkipTableList;
 
 @TableName("mouvement")
 public class Mouvement implements DirkFwModelTrait{
@@ -20,8 +19,8 @@ public class Mouvement implements DirkFwModelTrait{
     @ManytoOne(joinColumn = "id_article", toDisplayOnCombobox = "toDisplayOnCombobox")
     Article article;
 
-    @TableColumnName("type")
-    String typeMouvement;
+    @ManytoOne(joinColumn = "type", toDisplayOnCombobox = "toDisplayOnCombobox")
+    TypeMouvement typeMouvement;
 
     @TableColumnName("date_mouvement")
     LocalDateTime dateMouvement;
@@ -51,7 +50,6 @@ public class Mouvement implements DirkFwModelTrait{
 
     @TableColumnName("qte_prise")
     @IgnoreFormulaire
-    @SkipTableList
     Integer quantitePrise;
 
     @TableColumnName("total_prise_for_entree")
@@ -110,11 +108,11 @@ public class Mouvement implements DirkFwModelTrait{
         this.article = article;
     }
 
-    public String getTypeMouvement() {
+    public TypeMouvement getTypeMouvement() {
         return typeMouvement;
     }
 
-    public void setTypeMouvement(String typeMouvement) {
+    public void setTypeMouvement(TypeMouvement typeMouvement) {
         this.typeMouvement = typeMouvement;
     }
 
@@ -200,4 +198,7 @@ public class Mouvement implements DirkFwModelTrait{
     public String toDisplayOnCombobox(){
         return "Mouvement#"+this.id;
     }
+
+
+
 }

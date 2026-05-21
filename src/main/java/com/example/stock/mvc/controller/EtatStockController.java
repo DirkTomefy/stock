@@ -5,9 +5,11 @@ import java.awt.event.MouseListener;
 import java.time.LocalDateTime;
 import java.util.Vector;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import com.example.stock.dirkfw.display.util.DisplayUtil;
+import com.example.stock.mvc.model.EtatStock;
 import com.example.stock.mvc.model.EtatStockFormInput;
 import com.example.stock.mvc.service.EtatStockService;
 import com.example.stock.mvc.view.EtatStockView;
@@ -31,10 +33,21 @@ public class EtatStockController implements MouseListener {
         }
 
         loadData(input.getDate());
+        Double total=sumOfData();
+        JOptionPane.showMessageDialog(view, new JLabel("TOTAL : "+total));
     }
 
     public void loadDataNow() {
         loadData(LocalDateTime.now());
+    }
+
+    public double sumOfData(){
+        double sum=0;
+        for(Object o : this.view.getTable().getData()){
+            EtatStock e =(EtatStock) o;
+            sum+=e.getMoneyValueStock();
+        }
+        return sum;
     }
 
     private void loadData(LocalDateTime date) {

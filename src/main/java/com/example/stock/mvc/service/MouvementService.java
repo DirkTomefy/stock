@@ -225,6 +225,11 @@ public class MouvementService {
         }
     }
 
+    //TODO : pas pour le moment
+    private static void processSortieForProRata(Object mouvement , String view ,Double proportion ){
+        
+    }
+
     private static Mouvement buildSortie(Mouvement sortie, Mouvement entree, int prise) {
 
         Mouvement m = new Mouvement();

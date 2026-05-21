@@ -15,7 +15,9 @@ public class EtatStockView extends JPanel {
 
     private final EtatStockFormPanel form;
     private final EtatStockTablePanel table;
+   
 
+    
     public EtatStockView() throws ClassNotFoundException, SQLException {
         setLayout(new BorderLayout(10, 10));
 
@@ -29,6 +31,7 @@ public class EtatStockView extends JPanel {
 
         add(this.form, BorderLayout.NORTH);
         add(new JScrollPane(this.table), BorderLayout.CENTER);
+        
         table.addMouseListener(tableController);
         formController.loadDataNow();
     }

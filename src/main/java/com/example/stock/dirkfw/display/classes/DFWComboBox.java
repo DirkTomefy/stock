@@ -20,7 +20,7 @@ public class DFWComboBox extends JComboBox<Object> implements DFWInput {
     private final String displayMethodName;
 
     public DFWComboBox(FieldInfo fieldInfo, Object object, Vector<Object> items) {
-        super(items == null ? new Vector<>() : items);
+        super(buildItemsWithNullOption(fieldInfo, items));
         this.fieldInfo = fieldInfo;
         this.object = object;
         this.displayMethodName = resolveDisplayMethodName();
@@ -35,6 +35,27 @@ public class DFWComboBox extends JComboBox<Object> implements DFWInput {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static Vector<Object> buildItemsWithNullOption(FieldInfo fieldInfo, Vector<Object> items) {
+        Vector<Object> result = new Vector<>();
+        
+        // Add "tous" option if the field is nullable (non-primitive type)
+        if (isNullable(fieldInfo)) {
+            result.add(null);
+        }
+        
+        if (items != null) {
+            result.addAll(items);
+        }
+        
+        return result;
+    }
+
+    private static boolean isNullable(FieldInfo fieldInfo) {
+        Class<?> fieldType = fieldInfo.getReflectField().getType();
+        // Objects are nullable, primitives are not
+        return !fieldType.isPrimitive();
     }
 
     private String resolveDisplayMethodName() {

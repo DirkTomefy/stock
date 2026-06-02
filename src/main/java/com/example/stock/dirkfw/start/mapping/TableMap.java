@@ -308,8 +308,6 @@ public class TableMap {
     // =========================
 
     public static boolean isFieldOpperable(Field field) {
-        // A field is opperable when it is not ignored and either not a collection
-        // or explicitly annotated with @OneToMany (we want to handle those)
         return !field.isAnnotationPresent(IgnoreDbOpperation.class)
             && (!Collection.class.isAssignableFrom(field.getType()) || field.isAnnotationPresent(OneToMany.class));
     }
